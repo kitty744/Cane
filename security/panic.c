@@ -1,14 +1,15 @@
 #include <stdint.h>
 #include <cane/stdio.h>
 #include <cane/panic.h>
+#include <cane/vga.h>
 
 /**
  * @brief Panic-level Page Fault Handler.
  */
 void page_fault_handler(uint64_t error_code)
 {
-    clear_screen();
-    set_color(0x0C);
+    print_clear();
+    set_color(VGA_COLOR_LIGHT_RED);
     
     uint64_t fault_addr;
     asm volatile("mov %%cr2, %0" : "=r"(fault_addr));

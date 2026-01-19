@@ -50,25 +50,21 @@ void wait_for_keypress(void)
 /**
  * @brief Primary PS/2 IRQ1 Handler.
  */
-void keyboard_handler(void)
+void keyboard_handler()
 {
     uint8_t status = inb(0x64);
 
-    if ((status & 0x01) && !(status & 0x20))
-    {
+    if ((status & 0x01) && !(status & 0x20)) {
         uint8_t scancode = inb(0x60);
 
         if (scancode == 0x2A || scancode == 0x36)
             shift_pressed = 1;
         else if (scancode == 0xAA || scancode == 0xB6)
             shift_pressed = 0;
-        else if (!(scancode & 0x80))
-        {
+        else if (!(scancode & 0x80)) {
             key_pressed_flag = 1;
-            if (system_ready)
-            {
-                switch (scancode)
-                {
+            if (system_ready) {
+                switch (scancode) {
                 case 0x0E:
                     shell_input('\b');
                     break;
@@ -82,16 +78,17 @@ void keyboard_handler(void)
                     shell_input(-2);
                     break;
                 default:
-                    if (scancode < sizeof(scancode_to_ascii))
-                    {
+                    if (scancode < sizeof(scancode_to_ascii)) {
                         char c = shift_pressed ? scancode_to_ascii_shift[scancode] : scancode_to_ascii[scancode];
-                        if (c != 0) {
+                        if (c) {
                             shell_input(c);
                         }
                     }
+                    break;
                 }
             }
         }
     }
+
     pic_send_eoi(IRQ_KEYBOARD);
 }

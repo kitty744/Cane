@@ -4,6 +4,5 @@
 #include <stdint.h>
 
 void kmain(unsigned long magic, unsigned long addr);
-void clear_screen(void);
 
 #endif

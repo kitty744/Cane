@@ -19,12 +19,11 @@ extern char _kernel_end[];
  
 void kmain(unsigned long magic, unsigned long addr)
 {
+    print_clear();
+
     idt_init();
     gdt_init();
     
-    clear_screen();
- 
-
     if (magic != MULTIBOOT2_BOOTLOADER_MAGIC)
     {
         while (1)
@@ -83,10 +82,10 @@ void kmain(unsigned long magic, unsigned long addr)
  
     vmm_init();
     heap_init();
-    shell_init();
     keyboard_init();
+
+    shell_init();
     
-    /* Mark system as ready for keyboard input */
     system_ready = 1;
     
     /* Enable CPU interrupts */

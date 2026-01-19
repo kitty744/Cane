@@ -1,248 +1,187 @@
-#include <cane/stdio.h>
-#include <cane/io.h>
-#include <cane/string.h>
-#include <cane/spinlock.h>
-#include <stdint.h>
+/**
+ * @file stdio.c
+ * @brief Standard I/O library for VGA text mode and Serial output.
+ */
 
-static uint8_t cursor_x = 0;
-static uint8_t cursor_y = 0;
+#include "cane/stdio.h"
+#include "cane/io.h"
+#include "cane/spinlock.h"
+
+/* Higher Half Virtual Address for VGA Buffer */
+#define VGA_VIRT_ADDR 0xFFFFFFFF800B8000
+
+static uint16_t *vga_buffer = (uint16_t *)VGA_VIRT_ADDR;
+static int cursor_x = 0;
+static int cursor_y = 0;
+const int width = 80;
+const int height = 25;
 static uint8_t terminal_attribute = 0x0F;
-static spinlock_t console_lock = SPINLOCK_INIT;
 
+static spinlock_t vga_lock = {0};
+
+/**
+ * @brief Sets the global text color for kprint.
+ */
 void set_color(uint8_t color)
 {
     terminal_attribute = color;
 }
 
-static void update_cursor(void)
+/**
+ * @brief Writes a string to COM1 Serial Port for diagnostics.
+ * I/O ports (outb) do not change in the Higher Half.
+ */
+void serial_write(char *s)
 {
-    uint16_t pos = cursor_y * 80 + cursor_x;
-    outb(0x3D4, 14);
-    outb(0x3D5, pos >> 8);
-    outb(0x3D4, 15);
-    outb(0x3D5, pos & 0xFF);
+    spinlock_init(&vga_lock);
+    while (*s)
+    {
+        outb(0x3f8, *s++);
+    }
+    spinlock_release(&vga_lock);
 }
 
-void set_cursor(uint8_t x, uint8_t y)
+/**
+ * @brief Sends an integer to the serial port.
+ */
+void serial_write_int(uint64_t n)
 {
+    if (n == 0)
+    {
+        serial_write("0");
+        return;
+    }
+    char buf[21];
+    int i = 19;
+    buf[20] = '\0';
+    while (n > 0)
+    {
+        buf[i--] = (n % 10) + '0';
+        n /= 10;
+    }
+    serial_write(&buf[i + 1]);
+}
+
+int get_cursor_x() { return cursor_x; }
+int get_cursor_y() { return cursor_y; }
+
+/**
+ * @brief Communicates with the VGA hardware to move the blinking cursor.
+ */
+void update_cursor(int x, int y)
+{
+    uint16_t pos = y * width + x;
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+
+/**
+ * @brief Manually sets cursor position with spinlock protection.
+ */
+void set_cursor(int x, int y)
+{
+    spinlock_init(&vga_lock);
     cursor_x = x;
     cursor_y = y;
-    update_cursor();
+    update_cursor(cursor_x, cursor_y);
+    spinlock_release(&vga_lock);
 }
 
-void clear_screen(void)
+/**
+ * @brief Configures hardware cursor shape.
+ */
+void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 {
-    spinlock_acquire(&console_lock);
-    
-    volatile uint16_t *video = (volatile uint16_t *)0xB8000;
-    for (int i = 0; i < 80 * 25; i++)
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (inb(0x3D5) & 0xC0) | cursor_start);
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (inb(0x3D5) & 0xE0) | cursor_end);
+}
+
+/**
+ * @brief Clears the screen EXCEPT for the status bar (Row 0).
+ */
+void print_clear()
+{
+    spinlock_init(&vga_lock);
+    uint16_t blank = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
+    for (int i = 0; i < width * height; i++)
     {
-        video[i] = (terminal_attribute << 8) | ' ';
+        vga_buffer[i] = blank;
     }
     cursor_x = 0;
-    cursor_y = 0;
-    update_cursor();
-    
-    spinlock_release(&console_lock);
+    cursor_y = 1; // Keep text below the status bar
+    update_cursor(cursor_x, cursor_y);
+    spinlock_release(&vga_lock);
 }
 
-void putchar(char c)
+/**
+ * @brief Scrolls the screen up, preserving the status bar.
+ */
+void print_newline()
 {
-    spinlock_acquire(&console_lock);
-    
-    volatile uint16_t *video = (volatile uint16_t *)0xB8000;
-
-    switch (c)
+    cursor_x = 0;
+    if (cursor_y < height - 1)
     {
-    case '\n':
-        cursor_x = 0;
         cursor_y++;
-        break;
-    case '\r':
-        cursor_x = 0;
-        break;
-    case '\t':
-        cursor_x = (cursor_x + 8) & ~7;
-        break;
-    default:
-        if (cursor_x >= 80)
-        {
-            cursor_x = 0;
-            cursor_y++;
-        }
-        if (cursor_y >= 25)
-        {
-            cursor_y = 24;
-            for (int i = 0; i < 80 * 24; i++)
-            {
-                video[i] = video[i + 80];
-            }
-            for (int i = 80 * 24; i < 80 * 25; i++)
-            {
-                video[i] = (terminal_attribute << 8) | ' ';
-            }
-        }
-        video[cursor_y * 80 + cursor_x] = (terminal_attribute << 8) | c;
-        cursor_x++;
-        break;
     }
-    update_cursor();
-    
-    spinlock_release(&console_lock);
+    else
+    {
+        /* Move all rows from row 1 to height-1 UP by one */
+        for (int y = 1; y < height - 1; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                vga_buffer[y * width + x] = vga_buffer[(y + 1) * width + x];
+            }
+        }
+        /* Clear the bottom-most row only */
+        uint16_t blank = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
+        for (int x = 0; x < width; x++)
+        {
+            vga_buffer[(height - 1) * width + x] = blank;
+        }
+        cursor_y = height - 1;
+    }
+    update_cursor(cursor_x, cursor_y);
 }
 
 void puts(const char *str)
 {
     while (*str)
     {
-        putchar(*str++);
+        putc(*str++);
     }
 }
 
-void print_int(int num)
+/**
+ * @brief Prints a single character. Handles wrapping and scrolling.
+ */
+void putc(char c)
 {
-    if (num == 0)
+    spinlock_init(&vga_lock);
+    if (c == '\n')
     {
-        putchar('0');
+        spinlock_release(&vga_lock);
+        print_newline();
         return;
     }
 
-    char buffer[32];
-    int i = 0;
-
-    if (num < 0)
+    if (cursor_x >= width)
     {
-        putchar('-');
-        num = -num;
+        spinlock_release(&vga_lock);
+        print_newline();
+        spinlock_init(&vga_lock);
     }
 
-    while (num > 0)
-    {
-        buffer[i++] = '0' + (num % 10);
-        num /= 10;
-    }
+    uint8_t uc = (uint8_t)c;
+    vga_buffer[cursor_y * width + cursor_x] = (uint16_t)uc | ((uint16_t)terminal_attribute << 8);
 
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
-}
-
-void print_uint(uint64_t num)
-{
-    if (num == 0)
-    {
-        putchar('0');
-        return;
-    }
-
-    char buffer[32];
-    int i = 0;
-
-    while (num > 0)
-    {
-        buffer[i++] = '0' + (num % 10);
-        num /= 10;
-    }
-
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
-}
-
-void print_hex(uint64_t num)
-{
-    if (num == 0)
-    {
-        putchar('0');
-        return;
-    }
-
-    char buffer[32];
-    int i = 0;
-
-    while (num > 0)
-    {
-        int digit = num % 16;
-        buffer[i++] = (digit < 10) ? ('0' + digit) : ('a' + digit - 10);
-        num /= 16;
-    }
-
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
-}
-
-void print_hex_upper(uint64_t num)
-{
-    if (num == 0)
-    {
-        putchar('0');
-        return;
-    }
-
-    char buffer[32];
-    int i = 0;
-
-    while (num > 0)
-    {
-        int digit = num % 16;
-        buffer[i++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-        num /= 16;
-    }
-
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
-}
-
-void print_octal(uint64_t num)
-{
-    if (num == 0)
-    {
-        putchar('0');
-        return;
-    }
-
-    char buffer[32];
-    int i = 0;
-
-    while (num > 0)
-    {
-        buffer[i++] = '0' + (num % 8);
-        num /= 8;
-    }
-
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
-}
-
-void print_binary(uint64_t num)
-{
-    if (num == 0)
-    {
-        putchar('0');
-        return;
-    }
-
-    char buffer[64];
-    int i = 0;
-
-    while (num > 0)
-    {
-        buffer[i++] = '0' + (num % 2);
-        num /= 2;
-    }
-
-    while (i > 0)
-    {
-        putchar(buffer[--i]);
-    }
+    cursor_x++;
+    update_cursor(cursor_x, cursor_y);
+    spinlock_release(&vga_lock);
 }
 
 void printf(const char *format, ...)
@@ -290,12 +229,12 @@ void printf(const char *format, ...)
                     }
                     else
                     {
-                        print_uint(va_arg(args, unsigned long));
+                        print_hex(va_arg(args, unsigned long));
                     }
                 }
                 else
                 {
-                    print_uint(va_arg(args, unsigned long));
+                    print_hex(va_arg(args, unsigned long));
                 }
                 break;
             case 'x':
@@ -311,31 +250,187 @@ void printf(const char *format, ...)
                 print_binary(va_arg(args, unsigned int));
                 break;
             case 'p':
-                putchar('0');
-                putchar('x');
+                putc('0');
+                putc('x');
                 print_hex_upper((uint64_t)va_arg(args, void *));
                 break;
             case 's':
                 puts(va_arg(args, char *));
                 break;
             case 'c':
-                putchar(va_arg(args, int));
+                putc(va_arg(args, int));
                 break;
             case '%':
-                putchar('%');
+                putc('%');
                 break;
             default:
-                putchar('%');
-                putchar(*format);
+                putc('%');
+                putc(*format);
                 break;
             }
         }
         else
         {
-            putchar(*format);
+            putc(*format);
         }
         format++;
     }
 
     va_end(args);
+}
+
+void print_uint(uint64_t num)
+{
+    if (num == 0)
+    {
+        putc('0');
+        return;
+    }
+
+    char buffer[32];
+    int i = 0;
+
+    while (num > 0)
+    {
+        buffer[i++] = '0' + (num % 10);
+        num /= 10;
+    }
+
+    while (i > 0)
+    {
+        putc(buffer[--i]);
+    }
+}
+
+void print_int(uint64_t n)
+{
+    if (n == 0)
+    {
+        putc('0');
+        return;
+    }
+    char buf[21];
+    int i = 19;
+    buf[20] = '\0';
+    while (n > 0)
+    {
+        buf[i--] = (n % 10) + '0';
+        n /= 10;
+    }
+    printf(&buf[i + 1]);
+}
+
+void print_hex(uint64_t n)
+{
+    char *chars = "0123456789ABCDEF";
+    char buf[19];
+    buf[18] = '\0';
+    for (int i = 17; i >= 0; i--)
+    {
+        buf[i] = chars[n & 0xF];
+        n >>= 4;
+    }
+    printf("0x");
+    printf(buf);
+}
+
+void print_hex_upper(uint64_t num)
+{
+    if (num == 0)
+    {
+        putc('0');
+        return;
+    }
+
+    char buffer[32];
+    int i = 0;
+
+    while (num > 0)
+    {
+        int digit = num % 16;
+        buffer[i++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
+        num /= 16;
+    }
+
+    while (i > 0)
+    {
+        putc(buffer[--i]);
+    }
+}
+
+void print_octal(uint64_t num)
+{
+    if (num == 0)
+    {
+        putc('0');
+        return;
+    }
+
+    char buffer[32];
+    int i = 0;
+
+    while (num > 0)
+    {
+        buffer[i++] = '0' + (num % 8);
+        num /= 8;
+    }
+
+    while (i > 0)
+    {
+        putc(buffer[--i]);
+    }
+}
+
+void print_binary(uint64_t num)
+{
+    if (num == 0)
+    {
+        putc('0');
+        return;
+    }
+
+    char buffer[64];
+    int i = 0;
+
+    while (num > 0)
+    {
+        buffer[i++] = '0' + (num % 2);
+        num /= 2;
+    }
+
+    while (i > 0)
+    {
+        putc(buffer[--i]);
+    }
+}
+
+
+void serial_write_hex(uint32_t n)
+{
+    char hex[] = "0123456789ABCDEF";
+    char buffer[9] = "00000000";
+    for (int i = 7; i >= 0; i--)
+    {
+        buffer[i] = hex[n & 0xF];
+        n >>= 4;
+    }
+    serial_write("0x");
+    serial_write(buffer);
+}
+
+void print_backspace()
+{
+    spinlock_init(&vga_lock);
+    if (cursor_x > 0)
+    {
+        cursor_x--;
+    }
+    else if (cursor_y > 1)
+    { // Prevents backspacing into Row 0
+        cursor_y--;
+        cursor_x = width - 1;
+    }
+    vga_buffer[cursor_y * width + cursor_x] = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
+    update_cursor(cursor_x, cursor_y);
+    spinlock_release(&vga_lock);
 }

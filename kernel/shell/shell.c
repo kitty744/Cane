@@ -1,17 +1,21 @@
 /**
  * @file shell.c
  * @brief CaneOS Interactive Shell
+ * * Provides a command-line interface for system interaction. This module
+ * manages a local input buffer, handles character insertion/deletion,
+ * and interfaces with the VGA driver to provide a flicker-free experience
+ * through hardware cursor masking and coordinate math.
  */
 
-#include <cane/shell.h>
-#include <cane/stdio.h>
-#include <cane/string.h>
-#include <cane/io.h>
-#include <cane/pmm.h>
+#include "cane/stdio.h"
+#include "cane/string.h"
+#include "cane/io.h"
+#include "cane/pmm.h"
+#include "cane/heap.h"
 
 #define MAX_BUFFER 256
-#define PROMPT ">> "
-#define PROMPT_LEN 3
+#define PROMPT "Nexus >> "
+#define PROMPT_LEN 9
 
 static char input_buffer[MAX_BUFFER];
 static int buffer_len = 0;
@@ -19,56 +23,23 @@ static int cursor_idx = 0;
 static int prompt_start_y = 1;
 
 /**
- * @brief Get current cursor X position.
+ * @brief Disables the hardware cursor rendering.
+ * * Communicates with the CRT Controller (CRTC) registers. Setting bit 5
+ * of the Cursor Start Register (0x0A) instructs the VGA hardware to
+ * stop rendering the blinking cursor.
  */
-static int get_cursor_x(void)
-{
-    uint16_t pos;
-    outb(0x3D4, 0x0F);
-    pos = inb(0x3D5);
-    outb(0x3D4, 0x0E);
-    pos |= ((uint16_t)inb(0x3D5)) << 8;
-    return pos % 80;
-}
-
-/**
- * @brief Get current cursor Y position.
- */
-static int get_cursor_y(void)
-{
-    uint16_t pos;
-    outb(0x3D4, 0x0F);
-    pos = inb(0x3D5);
-    outb(0x3D4, 0x0E);
-    pos |= ((uint16_t)inb(0x3D5)) << 8;
-    return pos / 80;
-}
-
-/**
- * @brief Set cursor to specific position.
- */
-static void set_cursor_pos(int x, int y)
-{
-    uint16_t pos = y * 80 + x;
-    outb(0x3D4, 0x0F);
-    outb(0x3D5, (uint8_t)(pos & 0xFF));
-    outb(0x3D4, 0x0E);
-    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
-}
-
-/**
- * @brief Disables hardware cursor rendering.
- */
-static void hide_hardware_cursor(void)
+static void hide_hardware_cursor()
 {
     outb(0x3D4, 0x0A);
     outb(0x3D5, inb(0x3D5) | 0x20);
 }
 
 /**
- * @brief Enables hardware cursor rendering.
+ * @brief Enables the hardware cursor rendering.
+ * * Clears bit 5 of the Cursor Start Register (0x0A) to allow the
+ * VGA hardware to render the blinking cursor at the current register position.
  */
-static void show_hardware_cursor(void)
+static void show_hardware_cursor()
 {
     outb(0x3D4, 0x0A);
     outb(0x3D5, inb(0x3D5) & ~0x20);
@@ -76,64 +47,70 @@ static void show_hardware_cursor(void)
 
 /**
  * @brief Resets shell state and initializes prompt.
+ * * Clears the internal input buffer, resets the logical cursor index,
+ * and establishes the vertical anchor (prompt_start_y) for the current
+ * command line.
  */
-void shell_init(void)
+void shell_init()
 {
     memset(input_buffer, 0, MAX_BUFFER);
     buffer_len = 0;
     cursor_idx = 0;
 
-    /* Ensure shell starts below row 0 status bar */
+    /* Ensure the shell starts below the row 0 status bar */
     if (get_cursor_y() < 1)
-        set_cursor_pos(0, 1);
+        set_cursor(0, 1);
 
     prompt_start_y = get_cursor_y();
     printf(PROMPT);
 
-    /* Show hardware cursor at the end of prompt */
-    int final_total = PROMPT_LEN + cursor_idx;
-    int final_x = final_total % 80;
-    int final_y = prompt_start_y + (final_total / 80);
-    set_cursor_pos(final_x, final_y);
-    show_hardware_cursor();
 }
 
 /**
  * @brief Redraws the command line while preventing cursor ghosting.
+ * * This function masks the hardware cursor during the printing process.
+ * It calculates the absolute VGA coordinates based on prompt length
+ * and the current buffer index to handle line-wrapping across 80 columns.
  */
-static void redraw_line(void)
+static void redraw_line()
 {
-    /* Move cursor to start of input area */
-    set_cursor_pos(PROMPT_LEN, prompt_start_y);
-    
-    /* Clear the current line */
-    for (int i = 0; i < MAX_BUFFER; i++) {
-        putchar(' ');
-    }
-    
-    /* Move back to start */
-    set_cursor_pos(PROMPT_LEN, prompt_start_y);
-    
-    /* Print the buffer */
-    for (int i = 0; i < buffer_len; i++) {
-        putchar(input_buffer[i]);
-    }
-    
-    /* Position cursor at current position */
+    /* Calculate final landing spot for hardware cursor after redraw */
     int final_total = PROMPT_LEN + cursor_idx;
-    int final_x = final_total % 80;
-    int final_y = prompt_start_y + (final_total / 80);
-    set_cursor_pos(final_x, final_y);
+    int final_x = final_total % width;
+    int final_y = prompt_start_y + (final_total / width);
+
+    /* Temporarily hide cursor to prevent "ghosting" during putc calls */
+    hide_hardware_cursor();
+
+    /* Reset software cursor to the start of the current input line */
+    set_cursor(PROMPT_LEN, prompt_start_y);
+
+    /* Overwrite the current screen line(s) with the updated buffer */
+    for (int i = 0; i < buffer_len; i++)
+    {
+        putc(input_buffer[i]);
+    }
+
+    /* Print a trailing space to erase characters left over by backspaces */
+    putc(' ');
+
+    /* Synchronize the VGA cursor registers with the final calculated position */
+    set_cursor(final_x, final_y);
+
+    /* Restore hardware cursor visibility at the final destination */
+    show_hardware_cursor();
 }
 
 /**
  * @brief Logic for interpreting and executing shell commands.
+ * * Compares the input buffer against known commands and dispatches
+ * to the appropriate kernel subsystems with formatted output.
  */
-static void process_command(char *cmd)
+void process_command(char *cmd)
 {
     if (strcmp(cmd, "clear") == 0)
     {
-        clear_screen();
+        print_clear();
     }
     else if (strcmp(cmd, "help") == 0)
     {
@@ -141,7 +118,6 @@ static void process_command(char *cmd)
         printf("  help    - Display this menu\n");
         printf("  clear   - Clear the terminal screen\n");
         printf("  mem     - Show physical memory utilization\n");
-        printf("  reboot  - Restart the system via PS/2\n");
         printf("----------------------------------\n");
     }
     else if (strcmp(cmd, "mem") == 0)
@@ -152,13 +128,13 @@ static void process_command(char *cmd)
 
         printf("\n--- Physical Memory Mapping ---\n");
         printf("  Total: ");
-        printf("%llu", total / 1024);
+        print_int(total / 1024);
         printf(" MB\n");
         printf("  Used:  ");
-        printf("%llu", used / 1024);
+        print_int(used / 1024);
         printf(" MB\n");
         printf("  Free:  ");
-        printf("%llu", free / 1024);
+        print_int(free / 1024);
         printf(" MB\n");
         printf("-------------------------------\n");
     }
@@ -170,7 +146,7 @@ static void process_command(char *cmd)
     else if (strlen(cmd) > 0)
     {
         printf("Error: '");
-        printf("%s", cmd);
+        printf(cmd);
         printf("' is not recognized as a command.\n");
     }
 }
@@ -180,13 +156,6 @@ static void process_command(char *cmd)
  */
 void shell_input(signed char c)
 {
-    /* Debug: show what we received */
-    if (c >= 32 && c <= 126) {
-        printf("[%c]", c);
-    } else {
-        printf("{%d}", c);
-    }
-    
     if (c == '\n')
     {
         input_buffer[buffer_len] = '\0';
