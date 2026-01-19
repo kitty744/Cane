@@ -78,7 +78,7 @@ void kmain(unsigned long magic, unsigned long addr)
     }
  
     vmm_init();
-    kheap_init();
+    heap_init();
 
     uint64_t total = pmm_get_total_kb();
     uint64_t used = pmm_get_used_kb();

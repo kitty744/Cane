@@ -41,6 +41,11 @@ $(OBJDIR)/%.o: %.s
 	mkdir -p $(dir $@)
 	$(AS) -f elf32 $(ASFLAGS) -o $@ $<
 
+run:
+	./scripts/run.sh
+compat:
+	./scripts/compat.sh
+
 clean:
 	rm -rf $(OBJDIR) $(BINDIR) isofiles
 

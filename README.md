@@ -84,8 +84,11 @@ brew install x86_64-elf-gcc nasm grub qemu
 ### Quick Start
 
 ```bash
-# Build and run
-./scripts/run.sh
+# Build and run with supercharged setting's.
+make run
+
+# Build and run with low setting's to test compatability.
+make compat
 
 # Clean build artifacts
 make clean

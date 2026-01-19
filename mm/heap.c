@@ -15,7 +15,7 @@ typedef struct heap_node
 
 static heap_node_t *head = NULL;
 
-void kheap_init()
+void heap_init()
 {
     void *first_page = vmm_alloc(4096, 0x03);
     if (!first_page)
@@ -30,8 +30,11 @@ void kheap_init()
     head->free = 1;
 }
 
-void *kmalloc(uint64_t size)
+void *malloc(uint64_t size)
 {
+    if (size == 0)
+        return 0;
+        
     size = (size + 7) & ~7;
     heap_node_t *curr = head;
 
@@ -63,20 +66,12 @@ void *kmalloc(uint64_t size)
                 return 0;
             }
 
-            if (curr->free)
-            {
-                curr->size += 4096;
-                continue;
-            }
-            else
-            {
-                heap_node_t *new_node = (heap_node_t *)new_virt;
-                new_node->magic = HEAP_MAGIC;
-                new_node->size = 4096 - sizeof(heap_node_t);
-                new_node->next = 0;
-                new_node->free = 1;
-                curr->next = new_node;
-            }
+            heap_node_t *new_node = (heap_node_t *)new_virt;
+            new_node->magic = HEAP_MAGIC;
+            new_node->size = 4096 - sizeof(heap_node_t);
+            new_node->next = 0;
+            new_node->free = 1;
+            curr->next = new_node;
         }
         curr = curr->next;
     }
@@ -84,7 +79,7 @@ void *kmalloc(uint64_t size)
     return 0;
 }
 
-void kfree(void *ptr)
+void free(void *ptr)
 {
     if (!ptr)
         return;
@@ -107,6 +102,14 @@ void kfree(void *ptr)
             temp->next = temp->next->next;
             continue;
         }
+        
+        if (temp->next && temp->next->free && temp->free)
+        {
+            temp->size += sizeof(heap_node_t) + temp->next->size;
+            temp->next = temp->next->next;
+            continue;
+        }
+        
         temp = temp->next;
     }
 }

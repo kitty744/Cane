@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void kheap_init();
-void *kmalloc(uint64_t size);
-void kfree(void *ptr);
+void heap_init();
+void *malloc(uint64_t size);
+void free(void *ptr);
 
 #endif
