@@ -53,10 +53,10 @@ COCCI_DIR     := scripts/cocci
 COCCI_SCRIPTS := $(wildcard $(COCCI_DIR)/*.cocci)
 COCCI_TARGETS := $(filter %.c, $(KERNEL_SRCS))
 
-cocccicheck:
+coccinelle:
 	@for script in $(COCCI_SCRIPTS); do \
 		echo ">>> Applying: $$script"; \
 		spatch --sp-file $$script $(COCCI_TARGETS) -I include/ --macro-file scripts/cocci/cocci_macros.h || true; \
 	done
 
-.PHONY: all clean cocccicheck
+.PHONY: all clean coccinelle

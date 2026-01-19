@@ -49,7 +49,7 @@ spatch --sp-file scripts/cocci/null_check.cocci --dir mm/
 We have integrated these checks into the build system. To run all safety scripts against the entire codebase:
 
 ```bash
-make cocccicheck
+make coccinelle
 ```
 
 ## 5. Interpreting Results
@@ -60,4 +60,4 @@ make cocccicheck
 
 ---
 
-_Note: Always run `make cocccicheck` before submitting a Pull Request to ensure the kernel heap remains stable._
+_Note: Always run `make coccinelle` before submitting a Pull Request to ensure the kernel heap remains stable._
