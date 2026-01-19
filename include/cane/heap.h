@@ -1,9 +1,9 @@
-#ifndef CANE_HEAP_H
-#define CANE_HEAP_H
-
+#ifndef HEAP_H
+#define HEAP_H
 #include <stdint.h>
+#include <stddef.h>
 
-void heap_init(void);
+void kheap_init();
 void *kmalloc(uint64_t size);
 void kfree(void *ptr);
 
