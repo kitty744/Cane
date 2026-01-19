@@ -111,9 +111,11 @@ void print_clear()
     {
         buffer[i] = blank;
     }
+
     cursor_x = 0;
-    cursor_y = 1; // Keep text below the status bar
+    cursor_y = 1;
     update_cursor(cursor_x, cursor_y);
+    enable_cursor(14, 15); // Enable hardware cursor
     spinlock_release(&lock);
 }
 
@@ -416,6 +418,29 @@ void serial_write_hex(uint32_t n)
     }
     serial_write("0x");
     serial_write(buffer);
+}
+
+/**
+ * @brief Disables the hardware cursor rendering.
+ * * Communicates with the CRT Controller (CRTC) registers. Setting bit 5
+ * of the Cursor Start Register (0x0A) instructs the VGA hardware to
+ * stop rendering the blinking cursor.
+ */
+void hide_hardware_cursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, inb(0x3D5) | 0x20);
+}
+
+/**
+ * @brief Enables the hardware cursor rendering.
+ * * Clears bit 5 of the Cursor Start Register (0x0A) to allow the
+ * VGA hardware to render the blinking cursor at the current register position.
+ */
+void show_hardware_cursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, inb(0x3D5) & ~0x20);
 }
 
 void print_backspace()

@@ -14,36 +14,13 @@
 #include "cane/heap.h"
 
 #define MAX_BUFFER 256
-#define PROMPT "Nexus >> "
+#define PROMPT "Cane >> "
 #define PROMPT_LEN 9
 
 static char input_buffer[MAX_BUFFER];
 static int buffer_len = 0;
 static int cursor_idx = 0;
 static int prompt_start_y = 1;
-
-/**
- * @brief Disables the hardware cursor rendering.
- * * Communicates with the CRT Controller (CRTC) registers. Setting bit 5
- * of the Cursor Start Register (0x0A) instructs the VGA hardware to
- * stop rendering the blinking cursor.
- */
-static void hide_hardware_cursor()
-{
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, inb(0x3D5) | 0x20);
-}
-
-/**
- * @brief Enables the hardware cursor rendering.
- * * Clears bit 5 of the Cursor Start Register (0x0A) to allow the
- * VGA hardware to render the blinking cursor at the current register position.
- */
-static void show_hardware_cursor()
-{
-    outb(0x3D4, 0x0A);
-    outb(0x3D5, inb(0x3D5) & ~0x20);
-}
 
 /**
  * @brief Resets shell state and initializes prompt.
@@ -63,6 +40,7 @@ void shell_init()
 
     prompt_start_y = get_cursor_y();
     printf(PROMPT);
+    
 }
 
 /**
@@ -117,6 +95,7 @@ void process_command(char *cmd)
         printf("  help    - Display this menu\n");
         printf("  clear   - Clear the terminal screen\n");
         printf("  mem     - Show physical memory utilization\n");
+        printf("  reboot  - Reboot the system via PS/2");
         printf("----------------------------------\n");
     }
     else if (strcmp(cmd, "mem") == 0)
@@ -184,13 +163,22 @@ void shell_input(signed char c)
     }
     else if (c >= 32 && c <= 126 && buffer_len < MAX_BUFFER - 1)
     {
-        for (int i = buffer_len; i > cursor_idx; i--)
-        {
-            input_buffer[i] = input_buffer[i - 1];
+        if (cursor_idx == buffer_len) {
+            /* Typing at end of line - just append directly */
+            input_buffer[cursor_idx] = (char)c;
+            buffer_len++;
+            cursor_idx++;
+            putc(c);
+        } else {
+            /* Inserting in middle - need to redraw */
+            for (int i = buffer_len; i > cursor_idx; i--)
+            {
+                input_buffer[i] = input_buffer[i - 1];
+            }
+            input_buffer[cursor_idx] = (char)c;
+            buffer_len++;
+            cursor_idx++;
+            redraw_line();
         }
-        input_buffer[cursor_idx] = (char)c;
-        buffer_len++;
-        cursor_idx++;
-        redraw_line();
     }
 }

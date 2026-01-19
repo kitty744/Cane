@@ -34,6 +34,8 @@ int get_cursor_x();
 int get_cursor_y();
 
 void enable_cursor(uint8_t cursor_start, uint8_t cursor_end);
+void hide_hardware_cursor();
+void show_hardware_cursor();
 
 void set_color(uint8_t color);
 
