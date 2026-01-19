@@ -5,6 +5,12 @@
 
 static uint8_t cursor_x = 0;
 static uint8_t cursor_y = 0;
+static uint8_t terminal_attribute = 0x0F;
+
+void set_color(uint8_t color)
+{
+    terminal_attribute = color;
+}
 
 static void update_cursor(void)
 {
@@ -27,7 +33,7 @@ void clear_screen(void)
     volatile uint16_t *video = (volatile uint16_t *)0xB8000;
     for (int i = 0; i < 80 * 25; i++)
     {
-        video[i] = (0x0F << 8) | ' ';
+        video[i] = (terminal_attribute << 8) | ' ';
     }
     cursor_x = 0;
     cursor_y = 0;
@@ -51,7 +57,7 @@ void putchar(char c)
         cursor_x = (cursor_x + 8) & ~7;
         break;
     default:
-        video[cursor_y * 80 + cursor_x] = (0x0F << 8) | c;
+        video[cursor_y * 80 + cursor_x] = (terminal_attribute << 8) | c;
         cursor_x++;
         break;
     }
@@ -79,7 +85,7 @@ void puts(const char *str)
     }
 }
 
-static void print_int(int num)
+void print_int(int num)
 {
     if (num == 0)
     {
@@ -108,7 +114,7 @@ static void print_int(int num)
     }
 }
 
-static void print_uint(uint64_t num)
+void print_uint(uint64_t num)
 {
     if (num == 0)
     {
@@ -131,7 +137,7 @@ static void print_uint(uint64_t num)
     }
 }
 
-static void print_hex(uint64_t num)
+void print_hex(uint64_t num)
 {
     if (num == 0)
     {
@@ -155,7 +161,7 @@ static void print_hex(uint64_t num)
     }
 }
 
-static void print_hex_upper(uint64_t num)
+void print_hex_upper(uint64_t num)
 {
     if (num == 0)
     {
@@ -179,7 +185,7 @@ static void print_hex_upper(uint64_t num)
     }
 }
 
-static void print_octal(uint64_t num)
+void print_octal(uint64_t num)
 {
     if (num == 0)
     {
@@ -202,7 +208,7 @@ static void print_octal(uint64_t num)
     }
 }
 
-static void print_binary(uint64_t num)
+void print_binary(uint64_t num)
 {
     if (num == 0)
     {

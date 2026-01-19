@@ -1,6 +1,8 @@
 #include <cane/kernel.h>
 #include <cane/stdio.h>
 #include <cane/multiboot.h>
+#include <cane/idt.h>
+#include <cane/gdt.h>
 #include <cane/pmm.h>
 #include <cane/vmm.h>
 #include <cane/heap.h>
@@ -13,6 +15,9 @@ extern char _kernel_end[];
  
 void kmain(unsigned long magic, unsigned long addr)
 {
+    idt_init();
+    gdt_init();
+    
     clear_screen();
  
 
@@ -91,15 +96,6 @@ void kmain(unsigned long magic, unsigned long addr)
     printf(" MB\n");
     printf("-------------------------------\n");
 
-    while (1) {
-        asm volatile ("hlt");
-    }
-}
- 
-void panic(const char *msg) {
-    clear_screen();
-    printf("PANIC: %s\n", msg);
- 
     while (1) {
         asm volatile ("hlt");
     }
