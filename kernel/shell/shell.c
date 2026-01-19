@@ -63,7 +63,6 @@ void shell_init()
 
     prompt_start_y = get_cursor_y();
     printf(PROMPT);
-
 }
 
 /**

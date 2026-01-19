@@ -8,16 +8,16 @@
 #include "cane/spinlock.h"
 
 /* Higher Half Virtual Address for VGA Buffer */
-#define VGA_VIRT_ADDR 0xFFFFFFFF800B8000
+#define VIRT_ADDR 0xFFFFFFFF800B8000
 
-static uint16_t *vga_buffer = (uint16_t *)VGA_VIRT_ADDR;
+static uint16_t *buffer = (uint16_t *)VIRT_ADDR;
 static int cursor_x = 0;
 static int cursor_y = 0;
 const int width = 80;
 const int height = 25;
 static uint8_t terminal_attribute = 0x0F;
 
-static spinlock_t vga_lock = {0};
+static spinlock_t lock = {0};
 
 /**
  * @brief Sets the global text color for kprint.
@@ -33,12 +33,12 @@ void set_color(uint8_t color)
  */
 void serial_write(char *s)
 {
-    spinlock_init(&vga_lock);
+    spinlock_init(&lock);
     while (*s)
     {
         outb(0x3f8, *s++);
     }
-    spinlock_release(&vga_lock);
+    spinlock_release(&lock);
 }
 
 /**
@@ -82,11 +82,11 @@ void update_cursor(int x, int y)
  */
 void set_cursor(int x, int y)
 {
-    spinlock_init(&vga_lock);
+    spinlock_init(&lock);
     cursor_x = x;
     cursor_y = y;
     update_cursor(cursor_x, cursor_y);
-    spinlock_release(&vga_lock);
+    spinlock_release(&lock);
 }
 
 /**
@@ -105,16 +105,16 @@ void enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
  */
 void print_clear()
 {
-    spinlock_init(&vga_lock);
+    spinlock_init(&lock);
     uint16_t blank = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
     for (int i = 0; i < width * height; i++)
     {
-        vga_buffer[i] = blank;
+        buffer[i] = blank;
     }
     cursor_x = 0;
     cursor_y = 1; // Keep text below the status bar
     update_cursor(cursor_x, cursor_y);
-    spinlock_release(&vga_lock);
+    spinlock_release(&lock);
 }
 
 /**
@@ -134,14 +134,14 @@ void print_newline()
         {
             for (int x = 0; x < width; x++)
             {
-                vga_buffer[y * width + x] = vga_buffer[(y + 1) * width + x];
+                buffer[y * width + x] = buffer[(y + 1) * width + x];
             }
         }
         /* Clear the bottom-most row only */
         uint16_t blank = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
         for (int x = 0; x < width; x++)
         {
-            vga_buffer[(height - 1) * width + x] = blank;
+            buffer[(height - 1) * width + x] = blank;
         }
         cursor_y = height - 1;
     }
@@ -161,27 +161,27 @@ void puts(const char *str)
  */
 void putc(char c)
 {
-    spinlock_init(&vga_lock);
+    spinlock_init(&lock);
     if (c == '\n')
     {
-        spinlock_release(&vga_lock);
+        spinlock_release(&lock);
         print_newline();
         return;
     }
 
     if (cursor_x >= width)
     {
-        spinlock_release(&vga_lock);
+        spinlock_release(&lock);
         print_newline();
-        spinlock_init(&vga_lock);
+        spinlock_init(&lock);
     }
 
     uint8_t uc = (uint8_t)c;
-    vga_buffer[cursor_y * width + cursor_x] = (uint16_t)uc | ((uint16_t)terminal_attribute << 8);
+    buffer[cursor_y * width + cursor_x] = (uint16_t)uc | ((uint16_t)terminal_attribute << 8);
 
     cursor_x++;
     update_cursor(cursor_x, cursor_y);
-    spinlock_release(&vga_lock);
+    spinlock_release(&lock);
 }
 
 void printf(const char *format, ...)
@@ -420,7 +420,7 @@ void serial_write_hex(uint32_t n)
 
 void print_backspace()
 {
-    spinlock_init(&vga_lock);
+    spinlock_init(&lock);
     if (cursor_x > 0)
     {
         cursor_x--;
@@ -430,7 +430,7 @@ void print_backspace()
         cursor_y--;
         cursor_x = width - 1;
     }
-    vga_buffer[cursor_y * width + cursor_x] = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
+    buffer[cursor_y * width + cursor_x] = (uint16_t)' ' | ((uint16_t)terminal_attribute << 8);
     update_cursor(cursor_x, cursor_y);
-    spinlock_release(&vga_lock);
+    spinlock_release(&lock);
 }

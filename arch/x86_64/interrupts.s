@@ -50,6 +50,10 @@ page_fault_isr:
     add rsp, 8 ; Clean up the error code pushed by the CPU before returning
     iretq
 
+;-----------------------------------------------------------------------------
+; @brief Keyboard Interrupt Service Routine.
+; Routes IRQ 1 (mapped to Vector 33 via I/O APIC).
+;-----------------------------------------------------------------------------
 keyboard_isr:
     push rax
     push rcx
@@ -61,7 +65,6 @@ keyboard_isr:
     push r10
     push r11
 
-    ; Call C handler. Note: keyboard_handler must call pic_send_eoi() internally.
     call keyboard_handler
 
     pop r11

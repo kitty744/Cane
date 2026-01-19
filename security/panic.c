@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <cane/stdio.h>
 #include <cane/panic.h>
-#include <cane/vga.h>
+#include <cane/color.h>
 
 /**
  * @brief Panic-level Page Fault Handler.
@@ -9,7 +9,7 @@
 void page_fault_handler(uint64_t error_code)
 {
     print_clear();
-    set_color(VGA_COLOR_LIGHT_RED);
+    set_color(COLOR_LIGHT_RED);
     
     uint64_t fault_addr;
     asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
