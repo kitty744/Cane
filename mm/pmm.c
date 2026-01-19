@@ -1,6 +1,7 @@
 
 #include <cane/paging.h>
 #include <cane/pmm.h>
+#include <cane/spinlock.h>
 
 /* The offset used to access physical memory in the higher half */
 #define KERNEL_VIRT_OFFSET 0xFFFFFFFF80000000
@@ -9,6 +10,7 @@ static uint8_t *bitmap;
 static uint64_t bitmap_size;
 static uint64_t total_pages;
 static uint64_t used_pages;
+static spinlock_t pmm_lock = SPINLOCK_INIT;
 
 /**
  * @brief Initializes the PMM bitmap.
@@ -37,6 +39,8 @@ void pmm_init(uintptr_t start, uint64_t size)
  */
 void pmm_mark_free(uintptr_t addr)
 {
+    spinlock_acquire(&pmm_lock);
+    
     uint64_t block = addr / 4096;
     if (block < total_pages)
     {
@@ -47,6 +51,8 @@ void pmm_mark_free(uintptr_t addr)
                 used_pages--;
         }
     }
+    
+    spinlock_release(&pmm_lock);
 }
 
 /**
@@ -54,6 +60,8 @@ void pmm_mark_free(uintptr_t addr)
  */
 void pmm_mark_used(uintptr_t addr)
 {
+    spinlock_acquire(&pmm_lock);
+    
     uint64_t block = addr / 4096;
     if (block < total_pages)
     {
@@ -63,6 +71,8 @@ void pmm_mark_used(uintptr_t addr)
             used_pages++;
         }
     }
+    
+    spinlock_release(&pmm_lock);
 }
 
 /**
@@ -70,6 +80,8 @@ void pmm_mark_used(uintptr_t addr)
  */
 void *pmm_alloc_page()
 {
+    spinlock_acquire(&pmm_lock);
+    
     for (uint64_t i = 0; i < bitmap_size; i++)
     {
         if (bitmap[i] != 0xFF)
@@ -88,12 +100,15 @@ void *pmm_alloc_page()
                     bitmap[i] |= (1 << j);
                     used_pages++;
 
+                    spinlock_release(&pmm_lock);
                     /* Returns the RAW PHYSICAL address */
                     return (void *)addr;
                 }
             }
         }
     }
+    
+    spinlock_release(&pmm_lock);
     return 0;
 }
 

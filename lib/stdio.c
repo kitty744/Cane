@@ -1,11 +1,13 @@
 #include <cane/stdio.h>
 #include <cane/io.h>
 #include <cane/string.h>
+#include <cane/spinlock.h>
 #include <stdint.h>
 
 static uint8_t cursor_x = 0;
 static uint8_t cursor_y = 0;
 static uint8_t terminal_attribute = 0x0F;
+static spinlock_t console_lock = SPINLOCK_INIT;
 
 void set_color(uint8_t color)
 {
@@ -30,6 +32,8 @@ void set_cursor(uint8_t x, uint8_t y)
 
 void clear_screen(void)
 {
+    spinlock_acquire(&console_lock);
+    
     volatile uint16_t *video = (volatile uint16_t *)0xB8000;
     for (int i = 0; i < 80 * 25; i++)
     {
@@ -38,10 +42,14 @@ void clear_screen(void)
     cursor_x = 0;
     cursor_y = 0;
     update_cursor();
+    
+    spinlock_release(&console_lock);
 }
 
 void putchar(char c)
 {
+    spinlock_acquire(&console_lock);
+    
     volatile uint16_t *video = (volatile uint16_t *)0xB8000;
 
     switch (c)
@@ -57,24 +65,30 @@ void putchar(char c)
         cursor_x = (cursor_x + 8) & ~7;
         break;
     default:
+        if (cursor_x >= 80)
+        {
+            cursor_x = 0;
+            cursor_y++;
+        }
+        if (cursor_y >= 25)
+        {
+            cursor_y = 24;
+            for (int i = 0; i < 80 * 24; i++)
+            {
+                video[i] = video[i + 80];
+            }
+            for (int i = 80 * 24; i < 80 * 25; i++)
+            {
+                video[i] = (terminal_attribute << 8) | ' ';
+            }
+        }
         video[cursor_y * 80 + cursor_x] = (terminal_attribute << 8) | c;
         cursor_x++;
         break;
     }
-
-    if (cursor_x >= 80)
-    {
-        cursor_x = 0;
-        cursor_y++;
-    }
-
-    if (cursor_y >= 25)
-    {
-        cursor_y = 24;
-        cursor_x = 0;
-    }
-
     update_cursor();
+    
+    spinlock_release(&console_lock);
 }
 
 void puts(const char *str)

@@ -7,11 +7,14 @@
 #include <cane/paging.h>
 #include <cane/pmm.h>
 #include <cane/stdio.h>
+#include <cane/spinlock.h>
 
 #define KERNEL_VIRT_OFFSET 0xFFFFFFFF80000000ULL
 
 #define PHYS_TO_VIRT(phys) ((void *)((uint64_t)(phys) + KERNEL_VIRT_OFFSET))
 #define ENTRY_TO_PHYS(entry) ((uint64_t)(entry) & ~0xFFF)
+
+static spinlock_t vmm_lock = SPINLOCK_INIT;
 
 
 void vmm_init()
@@ -46,6 +49,8 @@ void vmm_map_range(uintptr_t virt, uintptr_t phys, uint64_t size, uint64_t flags
  */
 void *vmm_alloc(uint64_t pages, uint64_t flags)
 {
+    spinlock_acquire(&vmm_lock);
+    
     static uintptr_t next_alloc_addr = 0xFFFFFFFFB0000000;
 
     uintptr_t start_addr = next_alloc_addr;
@@ -54,6 +59,7 @@ void *vmm_alloc(uint64_t pages, uint64_t flags)
         void *phys = pmm_alloc_page();
         if (!phys)
         {
+            spinlock_release(&vmm_lock);
             return 0;
         }
         paging_map(next_alloc_addr, (uintptr_t)phys, flags);
@@ -61,6 +67,7 @@ void *vmm_alloc(uint64_t pages, uint64_t flags)
         next_alloc_addr += 4096;
     }
 
+    spinlock_release(&vmm_lock);
     return (void *)start_addr;
 }
 

@@ -10,6 +10,7 @@
 #include <cane/paging.h>
 #include <cane/pmm.h>
 #include <cane/stdio.h>
+#include <cane/spinlock.h>
 
 /** * @brief The offset to shift physical addresses into the higher half.
  * Must match the value in boot.s and linker.ld.
@@ -31,6 +32,8 @@ extern uint64_t p4_table[];
  * The linker now provides this as a higher-half address.
  */
 uint64_t *kernel_pml4 = (uint64_t *)p4_table;
+
+static spinlock_t paging_lock = SPINLOCK_INIT;
 
 /**
  * @brief Initializes paging by ensuring the PML4 is loaded into CR3.
@@ -59,6 +62,8 @@ void paging_init()
  */
 void paging_map(uint64_t virt, uint64_t phys, uint64_t flags)
 {
+    spinlock_acquire(&paging_lock);
+    
     uint64_t pml4_idx = (virt >> 39) & 0x1FF;
     uint64_t pdpt_idx = (virt >> 30) & 0x1FF;
     uint64_t pd_idx = (virt >> 21) & 0x1FF;
@@ -103,9 +108,10 @@ void paging_map(uint64_t virt, uint64_t phys, uint64_t flags)
 
     uint64_t *pt = (uint64_t *)PHYS_TO_VIRT(ENTRY_TO_PHYS(pd[pd_idx]));
 
-    /* 4. Set Leaf Entry */
-    pt[pt_idx] = phys | flags;
-
+    /* 4. PT -> Physical Page */
+    pt[pt_idx] = (phys & ~0xFFF) | flags;
+    
+    spinlock_release(&paging_lock);
     /* Invalidate TLB */
     asm volatile("invlpg (%0)" ::"r"(virt) : "memory");
 }
