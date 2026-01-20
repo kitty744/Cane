@@ -47,6 +47,33 @@ make clean
 4. **ISO Creation**: GRUB creates bootable ISO with multiboot2 support
 5. **Testing**: QEMU launches the OS with CD-ROM boot
 
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory to help contributors understand the codebase:
+
+### Library Documentation
+
+- **[STDIO Library](docs/code/lib/STDIO.md)** - VGA text mode output, serial communication, and formatted printing
+- **[String Library](docs/code/lib/STRING.md)** - String manipulation and utility functions
+- **[I/O Operations](docs/code/lib/IO.md)** - Hardware I/O port operations
+
+### Development Documentation
+
+- **[Project Structure](docs/code/structure/STRUCTURE.md)** - Overview of the codebase organization and architecture
+
+### Memory Documentation
+
+- **[Memory Management](docs/code/mm/MEM.md)** - Memory allocation and management functions
+
+### Driver's Documentation
+
+- **[Device Drivers](docs/code/drivers/DRIVERS.md)** - Hardware driver implementation details
+
+### Kernel Documentation
+
+- **[Boot Process](docs/code/kernel/BOOT.md)** - System startup and initialization sequence
+- **[Process Management](docs/code/kernel/PROCESSES.md)** - Task scheduling and process handling
+
 ## License
 
 This project is open source. See LICENSE file for details.
