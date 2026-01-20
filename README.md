@@ -51,36 +51,6 @@ CaneOS is a complete operating system designed to run on both old and new hardwa
 - **qemu-system-x86_64**: Emulation/testing
 - **kconfig-frontends**: Kernel configuration frontend
 
-### Installing
-
-```bash
-# Install's all required dependencies.
-make install
-```
-
-## Configuration
-
-CaneOS uses Kconfig for kernel configuration management, similar to the Linux kernel.
-
-### `make menuconfig`
-
-Launch the interactive configuration menu to customize kernel settings:
-
-```bash
-make menuconfig
-```
-
-**Configuration File:**
-
-- Settings are saved to `.config` in the project root
-- The configuration is automatically used when building
-
-**Usage Workflow:**
-
-1. Run `make menuconfig` to configure your kernel
-2. Save the configuration
-3. Run `make run` to build and test with your settings
-
 ## Building and Running
 
 ### Quick Start
