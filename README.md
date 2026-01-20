@@ -159,10 +159,6 @@ cane/
 ├── lib/                 # Standard library
 ├── include/cane/        # Public headers
 ├── scripts/             # Build and utility scripts
-├── Makefile             # Wildcard-based build system
-├── linker.ld            # Kernel memory layout
-├── .gitignore           # Version control exclusions
-└── .editorconfig        # Editor configuration
 ```
 
 ## Development Status
