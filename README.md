@@ -65,24 +65,71 @@ brew install x86_64-elf-gcc nasm grub qemu
 
 ## Building and Running
 
+### Make Targets
+
+#### `make run`
+
+Build and run CaneOS with default QEMU settings:
+
+- **Memory**: 15GB RAM
+- **CPU**: Maximum performance with 16 threads
+- **Graphics**: VGA standard mode
+- **Audio**: SDL audio output
+- **Machine**: Q35 chipset
+
+```bash
+make run
+```
+
+#### `make run [OPTIONS]`
+
+Build and run with custom QEMU settings. All arguments are passed directly to QEMU:
+
+- `-m [SIZE]` - Set memory amount (e.g., `-m 8G` for 8GB RAM)
+- `-smp [CORES]` - Set CPU core count (e.g., `-smp 4` for 4 cores)
+- `-soundhw [DEVICE]` - Set audio hardware (e.g., `-soundhw pcspk` for PC speaker)
+- `-audiodev [DEVICE]` - Set audio device (e.g., `-audiodev sdl` for SDL audio)
+- `-machine [CHIPSET]` - Set machine type (e.g., `-machine q35`)
+- `-cpu [TYPE]` - Set CPU model (e.g., `-cpu max` for maximum features)
+- `-vga [TYPE]` - Set graphics card (e.g., `-vga std` for standard VGA)
+- `-serial [TYPE]` - Set serial output (e.g., `-serial stdio`)
+- `-d [FLAG]` - Enable debug flags (e.g., `-d guest_errors`)
+
+```bash
+# Example: 8GB RAM, 4 CPU cores, PC speaker audio
+make run -m 8G -smp 4 -soundhw pcspk
+
+# Example: 4GB RAM, no audio
+make run -m 4G -audiodev none
+```
+
+#### `make all`
+
+Build the kernel and ISO only, without launching QEMU:
+
+```bash
+make all
+```
+
+#### `make clean`
+
+Remove all build artifacts:
+
+```bash
+make clean
+```
+
 ### Quick Start
 
 ```bash
-# NOTE: If you wish to change QEMU launch settings, please see: `scripts/build/run.sh` or `scripts/build/compat.sh`
-
-# Build and run with high settings
-# Settings: 16 Gigabytes of RAM, 16 Cpu cores.
+# Build and run with default settings
 make run
 
-# Build and run with low settings
-# Settings: 128 MB of RAM, 1 Cpu core.
-make compat
+# Build and run with custom QEMU settings
+make run -m 8G -smp 4 -soundhw pcspk
 
-# Clean build artifacts
-make clean
-
-# Build only (no QEMU)
-make all
+# Or run the script directly with arguments
+./scripts/run.sh -m 4G -audiodev none
 ```
 
 ### Build Process

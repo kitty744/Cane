@@ -42,9 +42,8 @@ $(OBJDIR)/%.o: %.s
 	$(AS) -f elf32 $(ASFLAGS) -o $@ $<
 
 run:
-	./scripts/build/run.sh
-compat:
-	./scripts/buildcompat.sh
+	chmod +x ./scripts/run.sh
+	./scripts/run.sh $$@
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR) isofiles
