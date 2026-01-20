@@ -53,14 +53,18 @@ CaneOS is a complete operating system designed to run on both old and new hardwa
 ### Dependencies
 
 ```bash
-# Ubuntu/Debian
-sudo apt install gcc-x86-64-elf-binutils nasm grub-common qemu-system-x86 kconfiglib
+# Ubuntu / Debian
+sudo apt update
+sudo apt install gcc-x86-64-elf-binutils nasm grub-common grub-pc-bin xorriso mtools qemu-system-x86 kconfig-frontends
 
 # Arch Linux
-sudo pacman -S gcc-x86_64-elf nasm grub qemu kconfig
+sudo pacman -S gcc-x86_64-elf nasm grub libisoburn mtools qemu-full
+yay -S kconfig-frontends
 
 # macOS (with Homebrew)
-brew install x86_64-elf-gcc nasm grub qemu kconfig
+brew install x86_64-elf-gcc nasm qemu xorriso mtools
+brew tap osx-cross/arm
+brew install kconfig-frontends
 ```
 
 ## Configuration
@@ -74,23 +78,6 @@ Launch the interactive configuration menu to customize kernel settings:
 ```bash
 make menuconfig
 ```
-
-**Available Configuration Options:**
-
-#### General Settings
-
-- **Memory Size** - Set QEMU memory allocation (default: 15G)
-- **CPU Core Count** - Number of CPU cores (default: 16)
-- **QEMU Machine Type** - Machine emulation type (default: q35)
-
-#### Graphics and Output
-
-- **Standard VGA Support** - Enable VGA graphics (default: enabled)
-- **Serial to Stdio** - Redirect serial output to terminal (default: enabled)
-
-#### Audio Drivers
-
-- **Enable Sound Hardware** - Enable audio support (default: disabled)
 
 **Configuration File:**
 
