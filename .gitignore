@@ -32,6 +32,7 @@ Thumbs.db
 # QEMU files
 *.img
 *.config
+*.old
 disk.img
 nvme_disk.img
 usb_disk.img
