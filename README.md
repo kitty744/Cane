@@ -4,41 +4,7 @@ A modern x86_64 operating system built from scratch with comprehensive hardware 
 
 ## Overview
 
-CaneOS is a complete operating system designed to run on both old and new hardware, featuring:
-
-- **x86_64 Architecture** with proper protection rings
-- **Multiboot2 Bootloader** compatibility
-- **Comprehensive Memory Management** (PMM, VMM, Heap)
-- **Enhanced I/O and Driver Support**
-- **Retro GUI** inspired by classic Windows versions
-- **Hardware Auto-Detection** for optimal performance
-
-## Features
-
-### Core Systems
-
-- ✅ **Multiboot2 Bootloader** with GRUB integration
-- ✅ **64-bit Higher Half Kernel** with proper virtual memory
-- ✅ **Physical Memory Manager (PMM)** with bitmap allocation
-- ✅ **Virtual Memory Manager (VMM)** with page mapping
-- ✅ **Kernel Heap** with malloc/free support
-- ✅ **Enhanced Printf** with extensive formatting options
-
-## Architecture
-
-### Protection Rings
-
-- **Ring 0**: Kernel core, memory management, interrupt handling
-- **Ring 1**: Direct hardware access layer
-- **Ring 2**: Hardware abstraction and system APIs
-- **Ring 3**: User applications and GUI
-
-### Memory Layout
-
-- **Physical Memory**: 1MB kernel load address
-- **Virtual Memory**: Higher half at 0xFFFFFFFF80000000
-- **Page Size**: 4KB with 2MB huge pages support
-- **Heap Management**: Static buffer with future dynamic expansion
+CaneOS is an operating system designed to run on both old and new hardware, featuring:
 
 ## Build Requirements
 
@@ -80,70 +46,6 @@ make clean
 3. **Linking**: LD creates the ELF kernel with proper memory layout
 4. **ISO Creation**: GRUB creates bootable ISO with multiboot2 support
 5. **Testing**: QEMU launches the OS with CD-ROM boot
-
-## Project Structure
-
-```
-cane/
-├── arch/x86_64/         # Architecture-specific code
-├── kernel/              # Core kernel implementation
-├── mm/                  # Memory management
-├── lib/                 # Standard library
-├── include/cane/        # Public headers
-├── scripts/             # Build and utility scripts
-```
-
-## Development Status
-
-### ✅ Completed
-
-- Multiboot2 bootloader with GRUB integration
-- 64-bit higher half kernel with proper paging
-- Complete memory management system (PMM, VMM, Heap)
-- Enhanced printf with extensive formatting options
-- Automated memory management initialization
-- Multiboot2 memory parsing
-- Interrupt handling system
-- **Interactive Command-line Shell** with full text editing capabilities
-- PS/2 Keyboard driver with arrow key support
-- VGA text mode display with cursor management
-
-### 🔄 In Progress
-
-- Implementing process management and multitasking
-- Developing a comprehensive driver framework
-- Enhancing the kernel's hardware abstraction layer
-
-### 📋 Planned
-
-- Comprehensive hardware drivers
-- Retro GUI system
-- User applications
-- Advanced networking stack
-
-## Printf Formatting Options
-
-CaneOS includes an enhanced printf with extensive formatting:
-
-```c
-// Numbers
-printf("%d", -42);        // Signed integer
-printf("%u", 42);         // Unsigned integer
-printf("%ld", 12345678);  // Long integer
-printf("%llu", 1234567890); // Long long unsigned
-
-// Bases
-printf("%x", 255);        // Hexadecimal (lowercase)
-printf("%X", 255);        // Hexadecimal (uppercase)
-printf("%o", 8);          // Octal
-printf("%b", 5);          // Binary
-
-// Other
-printf("%p", ptr);        // Pointer (0x format)
-printf("%s", "hello");    // String
-printf("%c", 'A');        // Character
-printf("%%");             // Literal percent
-```
 
 ## License
 
