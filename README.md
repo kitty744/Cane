@@ -83,46 +83,6 @@ make menuconfig
 
 ## Building and Running
 
-### Make Targets
-
-### `make install`
-
-Install all dependencies required.
-
-```bash
-make install
-```
-
-#### `make run`
-
-Build and run CaneOS with default QEMU settings:
-
-- **Memory**: 2G RAM
-- **CPU**: 5 cores
-- **Graphics**: VGA standard mode
-- **Audio**: SDL audio output
-- **Machine**: Q35 chipset
-
-```bash
-make run
-```
-
-#### `make all`
-
-Build the kernel and ISO only, without launching QEMU:
-
-```bash
-make all
-```
-
-#### `make clean`
-
-Remove all build artifacts:
-
-```bash
-make clean
-```
-
 ### Quick Start
 
 ```bash
