@@ -1,45 +1,8 @@
 #!/bin/bash
 
-# --- 1. DEPENDENCY CHECK & AUTO-INSTALLER ---
-check_and_install() {
-    # Core binaries needed for CaneOS
-    DEPS=("qemu-system-x86_64" "nasm" "x86_64-elf-gcc" "grub-mkrescue" "xorriso" "kconfig-mconf")
-    MISSING=()
+# Main script to build and boot the operating system using QEMU setting's defined in .config
 
-    for tool in "${DEPS[@]}"; do
-        if ! command -v "$tool" &> /dev/null; then
-            MISSING+=("$tool")
-        fi
-    done
-
-    if [ ${#MISSING[@]} -ne 0 ]; then
-        echo "[!] Missing dependencies: ${MISSING[*]}"
-        echo "[?] Attempting to identify OS and install..."
-
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if command -v apt &> /dev/null; then
-                echo "Detected Ubuntu/Debian. Installing..."
-                sudo apt update && sudo apt install -y gcc-x86-64-elf-binutils nasm grub-common grub-pc-bin xorriso mtools qemu-system-x86 kconfig-frontends
-            elif command -v pacman &> /dev/null; then
-                echo "Detected Arch Linux. Installing..."
-                sudo pacman -S --needed gcc-x86_64-elf nasm grub libisoburn mtools qemu-full
-                yay -S kconfig-frontends
-            fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            echo "Detected macOS. Installing via Homebrew..."
-            brew install x86_64-elf-gcc nasm qemu xorriso mtools
-            brew tap osx-cross/arm && brew install kconfig-frontends
-        else
-            echo "[ERROR] Unknown OS. Please install dependencies manually: ${MISSING[*]}"
-            exit 1
-        fi
-    fi
-}
-
-# Run the check
-check_and_install
-
-# --- 2. MAP KCONFIG TO QEMU ---
+# --- 1. MAP KCONFIG TO QEMU ---
 # If .config exists, Make will have exported these. If not, we use defaults.
 Q_MEM=$(echo ${CONFIG_MEM_SIZE:-2G} | tr -d '"')
 Q_SMP=$(echo ${CONFIG_CPU_CORES:-5} | tr -d '"')
@@ -59,7 +22,7 @@ if [ "$CONFIG_AUDIO_ENABLED" = "y" ]; then
     Q_AUDIO="-machine $Q_ARCH,pcspk-audiodev=audio0 -audiodev sdl,id=audio0 -soundhw ${CONFIG_SOUNDHW:-pcspk}"
 fi
 
-# --- 3. BUILD & RUN ---
+# --- 2. BUILD & RUN ---
 echo "[INFO]: Cleaning and Building CaneOS..."
 make clean && make all
 

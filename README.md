@@ -51,21 +51,11 @@ CaneOS is a complete operating system designed to run on both old and new hardwa
 - **qemu-system-x86_64**: Emulation/testing
 - **kconfig-frontends**: Kernel configuration frontend
 
-### Dependencies
+### Installing
 
 ```bash
-# Ubuntu / Debian
-sudo apt update
-sudo apt install gcc-x86-64-elf-binutils nasm grub-common grub-pc-bin xorriso mtools qemu-system-x86 kconfig-frontends
-
-# Arch Linux
-sudo pacman -S gcc-x86_64-elf nasm grub libisoburn mtools qemu-full
-yay -S kconfig-frontends
-
-# macOS (with Homebrew)
-brew install x86_64-elf-gcc nasm qemu xorriso mtools
-brew tap osx-cross/arm
-brew install kconfig-frontends
+# Install's all required dependencies.
+make install
 ```
 
 ## Configuration
@@ -94,6 +84,14 @@ make menuconfig
 ## Building and Running
 
 ### Make Targets
+
+### `make install`
+
+Install all dependencies required.
+
+```bash
+make install
+```
 
 #### `make run`
 
@@ -128,16 +126,19 @@ make clean
 ### Quick Start
 
 ```bash
-# 1. Configure kernel settings (optional)
+# 1. Install dependencies
+make install
+
+# 2. Configure kernel settings (optional)
 make menuconfig
 
-# 2. Build and run with configured settings
+# 3. Build and run with configured settings
 make run
 
-# 3. Build only (no QEMU)
+# 4. Build only (no QEMU)
 make all
 
-# 4. Clean build artifacts
+# 5. Clean build artifacts
 make clean
 ```
 

@@ -46,6 +46,9 @@ $(OBJDIR)/%.o: %.s
 export $(shell [ -f .config ] && sed 's/=.*//' .config)
 KCONFIG_MCONF := $(shell which kconfig-mconf || which mconf || echo kconfig-mconf)
 
+install:
+	@chmod +x ./scripts/install.sh
+	./scripts/install.sh
 run: all
 	@chmod +x ./scripts/run.sh
 	./scripts/run.sh
