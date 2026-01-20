@@ -1,5 +1,6 @@
 #include <cane/kernel.h>
 #include <cane/stdio.h>
+#include <cane/color.h>
 #include <cane/multiboot.h>
 #include <cane/idt.h>
 #include <cane/gdt.h>
@@ -84,6 +85,9 @@ void kmain(unsigned long magic, unsigned long addr)
     heap_init();
     keyboard_init();
 
+    set_color(COLOR_DARK_GREY);
+    printf("Type 'help' to begin.\n");
+    set_color(COLOR_GREEN);
     shell_init();
     
     system_ready = 1;

@@ -50,6 +50,7 @@ CaneOS is a complete operating system designed to run on both old and new hardwa
 - **grub-mkrescue**: ISO creation
 - **qemu-system-x86_64**: Emulation/testing
 - **kconfig-frontends**: Kernel configuration frontend
+- **coccinelle**: Debugging/Safety.
 
 ## Building and Running
 
