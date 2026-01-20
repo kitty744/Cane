@@ -78,9 +78,10 @@ void keyboard_handler()
                     shell_input(-2);
                     break;
                 default:
+                    /* Only process ASCII characters for valid scancodes */
                     if (scancode < sizeof(scancode_to_ascii)) {
                         char c = shift_pressed ? scancode_to_ascii_shift[scancode] : scancode_to_ascii[scancode];
-                        if (c) {
+                        if (c && c != '\0') {
                             shell_input(c);
                         }
                     }

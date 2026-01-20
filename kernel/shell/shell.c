@@ -7,15 +7,15 @@
  * through hardware cursor masking and coordinate math.
  */
 
-#include "cane/stdio.h"
-#include "cane/string.h"
-#include "cane/io.h"
-#include "cane/pmm.h"
-#include "cane/heap.h"
+#include <cane/stdio.h>
+#include <cane/string.h>
+#include <cane/io.h>
+#include <cane/pmm.h>
+#include <cane/heap.h>
 
 #define MAX_BUFFER 256
 #define PROMPT "Cane >> "
-#define PROMPT_LEN 9
+#define PROMPT_LEN 8
 
 static char input_buffer[MAX_BUFFER];
 static int buffer_len = 0;
@@ -34,13 +34,12 @@ void shell_init()
     buffer_len = 0;
     cursor_idx = 0;
 
-    /* Ensure the shell starts below the row 0 status bar */
     if (get_cursor_y() < 1)
         set_cursor(0, 1);
 
     prompt_start_y = get_cursor_y();
-    printf(PROMPT);
-    
+    puts(PROMPT);
+
 }
 
 /**
@@ -56,7 +55,7 @@ static void redraw_line()
     int final_x = final_total % width;
     int final_y = prompt_start_y + (final_total / width);
 
-    /* Temporarily hide cursor to prevent "ghosting" during putc calls */
+    /* Temporarily hide cursor to prevent "ghosting" during kputc calls */
     hide_hardware_cursor();
 
     /* Reset software cursor to the start of the current input line */
@@ -91,12 +90,12 @@ void process_command(char *cmd)
     }
     else if (strcmp(cmd, "help") == 0)
     {
-        printf("\n--- CaneOS Command Interface ---\n");
-        printf("  help    - Display this menu\n");
-        printf("  clear   - Clear the terminal screen\n");
-        printf("  mem     - Show physical memory utilization\n");
-        printf("  reboot  - Reboot the system via PS/2");
-        printf("----------------------------------\n");
+        puts("\n--- NexusOS Command Interface ---\n");
+        puts("  help    - Display this menu\n");
+        puts("  clear   - Clear the terminal screen\n");
+        puts("  mem     - Show physical memory utilization\n");
+        puts("  reboot  - Restart the system via PS/2\n");
+        puts("----------------------------------\n");
     }
     else if (strcmp(cmd, "mem") == 0)
     {
@@ -104,28 +103,28 @@ void process_command(char *cmd)
         uint64_t used = pmm_get_used_kb();
         uint64_t free = total - used;
 
-        printf("\n--- Physical Memory Mapping ---\n");
-        printf("  Total: ");
+        puts("\n--- Physical Memory Mapping ---\n");
+        puts("  Total: ");
         print_int(total / 1024);
-        printf(" MB\n");
-        printf("  Used:  ");
+        puts(" MB\n");
+        puts("  Used:  ");
         print_int(used / 1024);
-        printf(" MB\n");
-        printf("  Free:  ");
+        puts(" MB\n");
+        puts("  Free:  ");
         print_int(free / 1024);
-        printf(" MB\n");
-        printf("-------------------------------\n");
+        puts(" MB\n");
+        puts("-------------------------------\n");
     }
     else if (strcmp(cmd, "reboot") == 0)
     {
-        printf("Sending reset signal to PS/2 controller...\n");
+        puts("Sending reset signal to PS/2 controller...\n");
         outb(0x64, 0xFE);
     }
     else if (strlen(cmd) > 0)
     {
-        printf("Error: '");
-        printf(cmd);
-        printf("' is not recognized as a command.\n");
+        puts("Error: '");
+        puts(cmd);
+        puts("' is not recognized as a command.\n");
     }
 }
 
@@ -137,7 +136,7 @@ void shell_input(signed char c)
     if (c == '\n')
     {
         input_buffer[buffer_len] = '\0';
-        printf("\n");
+        puts("\n");
         process_command(input_buffer);
         shell_init();
     }
@@ -149,6 +148,7 @@ void shell_input(signed char c)
         }
         buffer_len--;
         cursor_idx--;
+        
         redraw_line();
     }
     else if (c == -1 && cursor_idx > 0)
@@ -163,22 +163,14 @@ void shell_input(signed char c)
     }
     else if (c >= 32 && c <= 126 && buffer_len < MAX_BUFFER - 1)
     {
-        if (cursor_idx == buffer_len) {
-            /* Typing at end of line - just append directly */
-            input_buffer[cursor_idx] = (char)c;
-            buffer_len++;
-            cursor_idx++;
-            putc(c);
-        } else {
-            /* Inserting in middle - need to redraw */
-            for (int i = buffer_len; i > cursor_idx; i--)
-            {
-                input_buffer[i] = input_buffer[i - 1];
-            }
-            input_buffer[cursor_idx] = (char)c;
-            buffer_len++;
-            cursor_idx++;
-            redraw_line();
+        /* Inserting in middle - need to redraw */
+        for (int i = buffer_len; i > cursor_idx; i--)
+        {
+            input_buffer[i] = input_buffer[i - 1];
         }
+        input_buffer[cursor_idx] = (char)c;
+        buffer_len++;
+        cursor_idx++;
+        redraw_line();
     }
 }
