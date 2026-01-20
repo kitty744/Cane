@@ -23,7 +23,7 @@ Before submitting a pull request, you must ensure your code passes our Coccinell
 Run the following command:
 
 ```bash
-make cocccicheck
+make coccinelle
 ```
 
 If any output is produced, fix the flagged lines before committing.
@@ -33,7 +33,7 @@ If any output is produced, fix the flagged lines before committing.
 1.  **Fork** the repository.
 2.  **Create a branch** for your feature (e.g., `git checkout -b feature/driver-x`).
 3.  **Write tests** if applicable.
-4.  **Run the analysis** (`make cocccicheck`).
+4.  **Run the analysis** (`make coccinelle`).
 5.  **Submit a Pull Request** with a detailed description of your changes.
 
 ## 5. Panic and Debugging
