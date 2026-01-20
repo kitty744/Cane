@@ -57,30 +57,35 @@ int y = get_cursor_y();
 
 ### Color Support
 
-Use VGA color attributes where the lower 4 bits are foreground and upper 4 bits are background:
+Use the color definitions from "cane/color.h" for consistent color management:
 
 ```c
-// Common colors
-#define COLOR_BLACK     0x00
-#define COLOR_BLUE      0x01
-#define COLOR_GREEN     0x02
-#define COLOR_CYAN      0x03
-#define COLOR_RED       0x04
-#define COLOR_MAGENTA   0x05
-#define COLOR_BROWN     0x06
-#define COLOR_LIGHT_GREY 0x07
-#define COLOR_GREY      0x08
-#define COLOR_LIGHT_BLUE 0x09
-#define COLOR_LIGHT_GREEN 0x0A
-#define COLOR_LIGHT_CYAN  0x0B
-#define COLOR_LIGHT_RED   0x0C
-#define COLOR_LIGHT_MAGENTA 0x0D
-#define COLOR_YELLOW    0x0E
-#define COLOR_WHITE      0x0F
+#include "cane/color.h"
 
-set_color(COLOR_LIGHT_GREEN | COLOR_BLUE);  // Light green on blue
-printf("Colored text\n");
-set_color(COLOR_WHITE | COLOR_BLACK);        // Reset to default
+// Basic colors
+set_color(COLOR_WHITE);              // Default white text
+set_color(COLOR_RED);                // Red text
+set_color(COLOR_GREEN);              // Green text
+set_color(COLOR_BLUE);               // Blue text
+set_color(COLOR_YELLOW);             // Yellow text
+set_color(COLOR_CYAN);               // Cyan text
+set_color(COLOR_MAGENTA);            // Magenta text
+
+// Background colors
+set_color(COLOR_WHITE | COLOR_BG_BLACK);    // White on black
+set_color(COLOR_RED | COLOR_BG_WHITE);      // Red on white
+set_color(COLOR_GREEN | COLOR_BG_BLUE);      // Green on blue
+set_color(COLOR_YELLOW | COLOR_BG_RED);      // Yellow on red
+
+// Bright colors
+set_color(COLOR_BRIGHT_WHITE);       // Bright white
+set_color(COLOR_BRIGHT_RED);         // Bright red
+set_color(COLOR_BRIGHT_GREEN);       // Bright green
+set_color(COLOR_BRIGHT_BLUE);        // Bright blue
+
+// Custom combinations
+uint8_t custom_color = COLOR_GREEN | COLOR_BG_BLUE | COLOR_BRIGHT;
+set_color(custom_color);
 ```
 
 ### Cursor Control
@@ -172,19 +177,20 @@ The STDIO library is designed to be robust:
 
 ```c
 #include "cane/stdio.h"
+#include "cane/color.h"
 
 void init_display(void) {
     // Initialize display system
-    set_color(COLOR_WHITE | COLOR_BLACK);
+    set_color(COLOR_WHITE | COLOR_BG_BLACK);
     print_clear();
 
     // Set up status bar
     set_cursor(0, 0);
-    set_color(COLOR_BLACK | COLOR_LIGHT_GREY);
+    set_color(COLOR_BLACK | COLOR_BG_LIGHT_GREY);
     printf("CaneOS v1.0 - Ready");
 
     // Reset to user area
-    set_color(COLOR_WHITE | COLOR_BLACK);
+    set_color(COLOR_WHITE | COLOR_BG_BLACK);
     set_cursor(0, 1);
 }
 
@@ -194,6 +200,14 @@ void kernel_main(void) {
     printf("System initialization complete\n");
     printf("Memory: %d MB available\n", get_memory_size());
 
+    // Color-coded status messages
+    set_color(COLOR_GREEN);
+    printf("[OK] Kernel initialized\n");
+
+    set_color(COLOR_YELLOW);
+    printf("[WARN] Debug mode enabled\n");
+
+    set_color(COLOR_WHITE);  // Reset to default
     serial_write("Kernel initialization successful\n");
 }
 ```

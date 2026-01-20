@@ -72,7 +72,6 @@ Comprehensive documentation is available in the `docs/` directory to help contri
 ### Kernel Documentation
 
 - **[Boot Process](docs/code/kernel/BOOT.md)** - System startup and initialization sequence
-- **[Process Management](docs/code/kernel/PROCESSES.md)** - Task scheduling and process handling
 
 ## License
 
