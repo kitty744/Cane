@@ -24,22 +24,6 @@ CaneOS is a complete operating system designed to run on both old and new hardwa
 - ✅ **Kernel Heap** with malloc/free support
 - ✅ **Enhanced Printf** with extensive formatting options
 
-### Hardware Support (Planned)
-
-- 🔄 **Storage**: ATA, AHCI, NVMe, FDC drivers
-- 🔄 **Input**: PS/2 and XHCI USB support
-- 🔄 **Networking**: Ethernet and wireless drivers
-- 🔄 **Graphics**: VGA and modern GPU support
-- 🔄 **Audio**: Sound card compatibility
-- 🔄 **Bluetooth**: Modern wireless connectivity
-
-### User Interface
-
-- 🔄 **Command Line Shell** with comprehensive utilities
-- 🔄 **Retro GUI** with pixel art aesthetics
-- 🔄 **Window Management System**
-- 🔄 **Application Framework**
-
 ## Architecture
 
 ### Protection Rings
@@ -132,12 +116,15 @@ cane/
 - Automated memory management initialization
 - Multiboot2 memory parsing
 - Interrupt handling system
-- Command-line shell
+- **Interactive Command-line Shell** with full text editing capabilities
+- PS/2 Keyboard driver with arrow key support
+- VGA text mode display with cursor management
 
 ### 🔄 In Progress
 
-- Process management and multitasking
-- Driver framework initialization
+- Implementing process management and multitasking
+- Developing a comprehensive driver framework
+- Enhancing the kernel's hardware abstraction layer
 
 ### 📋 Planned
 
