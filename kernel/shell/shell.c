@@ -14,8 +14,8 @@
 #include <valen/heap.h>
 
 #define MAX_BUFFER 256
-#define PROMPT "Valen >> "
-#define PROMPT_LEN 8
+#define PROMPT "valen >> "
+#define PROMPT_LEN 9
 
 static char input_buffer[MAX_BUFFER];
 static int buffer_len = 0;
@@ -90,7 +90,7 @@ void process_command(char *cmd)
     }
     else if (strcmp(cmd, "help") == 0)
     {
-        puts("\n--- NexusOS Command Interface ---\n");
+        puts("\n--- Valen Command Interface ---\n");
         puts("  help    - Display this menu\n");
         puts("  clear   - Clear the terminal screen\n");
         puts("  mem     - Show physical memory utilization\n");
