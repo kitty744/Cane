@@ -143,6 +143,40 @@ printf("Character: %c\n", 'A');
 printf("Literal %%: %%\n");
 ```
 
+## String to Number Conversion
+
+The STDIO library provides string parsing functions:
+
+```c
+// Convert string to integer
+int result = atoi("123");        // Returns 123
+int negative = atoi("-45");       // Returns -45
+int with_space = atoi("  7  ");  // Returns 7
+
+// Handle invalid input gracefully
+int invalid = atoi("abc");       // Returns 0
+```
+
+### atoi Function Details
+
+The `atoi` function handles:
+
+- Leading whitespace (spaces, tabs, newlines)
+- Optional sign (+ or -)
+- Digit sequences
+- Stops at first non-digit character
+
+```c
+// Examples
+atoi("123")      // 123
+atoi("-45")      // -45
+atoi("+67")      // 67
+atoi("  89 ")    // 89
+atoi("12abc34")   // 12 (stops at 'a')
+atoi("abc")       // 0
+atoi("")          // 0
+```
+
 ## Serial Communication
 
 Serial output is primarily used for debugging and diagnostics:

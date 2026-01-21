@@ -5,5 +5,7 @@
 
 void shell_init(void);
 void shell_input(signed char c);
+void process_command(char *cmd);
+void shell_task_main(void);
 
 #endif

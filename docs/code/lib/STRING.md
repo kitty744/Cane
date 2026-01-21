@@ -41,6 +41,18 @@ int strlen(const char *str);
 
 // String comparison
 int strcmp(const char *str1, const char *str2);
+
+// Partial string comparison
+int strncmp(const char *str1, const char *str2, uint64_t n);
+
+// Character search
+char *strchr(const char *str, int c);
+
+// String copy
+char *strcpy(char *dest, const char *src);
+
+// Length-limited string copy
+char *strncpy(char *dest, const char *src, uint64_t n);
 ```
 
 ### Memory Operations
@@ -102,6 +114,101 @@ int result = strcmp("apple", "banana");  // Returns negative value
 if (strcmp(str1, str2) == 0) {
     // Strings are equal
 }
+```
+
+### strncmp
+
+Compares first n characters of two strings lexicographically.
+
+```c
+int strncmp(const char *str1, const char *str2, uint64_t n);
+```
+
+**Parameters:**
+
+- `str1` - First string to compare
+- `str2` - Second string to compare
+- `n` - Maximum number of characters to compare
+
+**Returns:**
+
+- `< 0` if str1 < str2
+- `0` if str1 == str2 (for first n characters)
+- `> 0` if str1 > str2
+
+**Example:**
+
+```c
+int result = strncmp("hello world", "hello there", 5);  // Returns 0
+int partial = strncmp("testing", "test", 4);          // Returns 0
+```
+
+### strchr
+
+Finds first occurrence of a character in a string.
+
+```c
+char *strchr(const char *str, int c);
+```
+
+**Parameters:**
+
+- `str` - String to search in
+- `c` - Character to find
+
+**Returns:** Pointer to first occurrence, or NULL if not found
+
+**Example:**
+
+```c
+char *found = strchr("Hello, World", ',');    // Returns pointer to ','
+char *first_a = strchr("banana", 'a');         // Returns pointer to first 'a'
+```
+
+### strcpy
+
+Copies a source string to destination buffer.
+
+```c
+char *strcpy(char *dest, const char *src);
+```
+
+**Parameters:**
+
+- `dest` - Destination buffer
+- `src` - Source string
+
+**Returns:** Pointer to destination string
+
+**Example:**
+
+```c
+char dest[100];
+strcpy(dest, "Hello, World!");
+```
+
+### strncpy
+
+Copies up to n characters from source to destination buffer.
+
+```c
+char *strncpy(char *dest, const char *src, uint64_t n);
+```
+
+**Parameters:**
+
+- `dest` - Destination buffer
+- `src` - Source string
+- `n` - Maximum characters to copy
+
+**Returns:** Pointer to destination string
+
+**Example:**
+
+```c
+char safe_dest[10];
+strncpy(safe_dest, "This is a long string", 9);
+safe_dest[9] = '\0';  // Ensure null termination
 ```
 
 ### memset
@@ -350,14 +457,29 @@ void memory_example(void) {
 
 ## Limitations
 
-The current string library is intentionally simple and includes only the most essential functions:
+The current string library provides essential functions for kernel operations:
 
-- **No strcasecmp** - Case-insensitive comparison not available
-- **No strncpy** - No length-limited string copy
-- **No strstr** - No substring search
-- **No strtok** - No string tokenization
-- **No sprintf** - No formatted string functions
+**Available Functions:**
 
-Additional functions can be added as needed for specific kernel requirements.
+**strlen** - String length calculation
+**strcmp** - String comparison
+**strncmp** - Partial string comparison
+**strchr** - Character search
+**strcpy** - String copy
+**strncpy** - Length-limited string copy
+**memset** - Memory fill
+**memcpy** - Memory copy
 
-This string library provides the essential functionality needed for basic kernel string and memory operations while remaining simple and efficient.
+**Not Yet Implemented:**
+
+**strcasecmp** - Case-insensitive comparison
+**strstr** - Substring search
+**strtok** - String tokenization
+**sprintf** - Formatted string functions
+**strcat** - String concatenation
+
+Additional functions can be added as needed for specific kernel requirements. The current implementation provides the essential functionality needed for basic kernel string and memory operations while remaining simple and efficient.
+
+```
+
+```

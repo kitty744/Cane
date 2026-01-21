@@ -3,11 +3,14 @@
 extern page_fault_handler
 extern keyboard_handler
 extern generic_handler
+extern scheduler_tick
+extern pic_send_eoi
 
 global load_idt
 global page_fault_isr
 global keyboard_isr
 global generic_isr
+global timer_isr
 
 page_fault_isr:
     push rax
@@ -46,7 +49,6 @@ page_fault_isr:
     pop rcx
     pop rbx
     pop rax
-
     add rsp, 8 ; Clean up the error code pushed by the CPU before returning
     iretq
 
@@ -60,17 +62,63 @@ keyboard_isr:
     push rdx
     push rsi
     push rdi
+    push rbp
     push r8
     push r9
     push r10
     push r11
-
+    push r12
+    push r13
+    push r14
+    push r15
     call keyboard_handler
-
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop r11
     pop r10
     pop r9
     pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rax
+    iretq
+
+;-----------------------------------------------------------------------------
+; @brief Timer Interrupt Service Routine.
+; Routes IRQ 0 (mapped to Vector 0x20 via I/O APIC).
+;-----------------------------------------------------------------------------
+timer_isr:
+    push rax
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+    call scheduler_tick
+    mov rdi, 0
+    call pic_send_eoi
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
     pop rdi
     pop rsi
     pop rdx
@@ -84,18 +132,26 @@ generic_isr:
     push rdx
     push rsi
     push rdi
+    push rbp
     push r8
     push r9
     push r10
     push r11
-
+    push r12
+    push r13
+    push r14
+    push r15
     ; Call generic handler
     call generic_handler
-
+    pop r15
+    pop r14
+    pop r13
+    pop r12
     pop r11
     pop r10
     pop r9
     pop r8
+    pop rbp
     pop rdi
     pop rsi
     pop rdx

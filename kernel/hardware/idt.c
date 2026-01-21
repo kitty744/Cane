@@ -24,6 +24,8 @@ struct idt_ptr idtp;
 extern void page_fault_isr();
 extern void keyboard_isr();
 extern void generic_isr();
+extern void scheduler_tick();
+extern void timer_isr();
 extern void load_idt(struct idt_ptr *ptr);
 
 /* --- Generic Handler --- */
@@ -80,6 +82,9 @@ void idt_init()
     /* 4. Register Hardware IRQs */
     /* IRQ 1: Keyboard - Vector 0x21 (0x20 + 1) */
     idt_set_descriptor(33, keyboard_isr, 0x8E);
+    
+    /* IRQ 0: Timer - Vector 0x20 (0x20 + 0) */
+    idt_set_descriptor(32, timer_isr, 0x8E);
 
     /* 5. Configure IDT Pointer and load into CPU register */
     idtp.limit = (sizeof(struct idt_entry) * 256) - 1;

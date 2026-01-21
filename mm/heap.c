@@ -12,20 +12,17 @@ typedef struct heap_node
     uint64_t size;
     struct heap_node *next;
     int free;
-} heap_node_t;
+} __attribute__((packed)) heap_node_t;
 
 static heap_node_t *head = NULL;
 static spinlock_t heap_lock = SPINLOCK_INIT;
 
 void heap_init()
 {
-    void *first_page = vmm_alloc(4096, 0x03);
-    if (!first_page)
-    {
-        return;
-    }
+    // Use static heap area for kernel memory management
+    static char heap_area[4096] __attribute__((aligned(4096)));
 
-    head = (heap_node_t *)first_page;
+    head = (heap_node_t *)heap_area;
     head->magic = HEAP_MAGIC;
     head->size = 4096 - sizeof(heap_node_t);
     head->next = 0;
@@ -38,6 +35,11 @@ void *malloc(uint64_t size)
         return 0;
         
     spinlock_acquire(&heap_lock);
+    
+    if (!head) {
+        spinlock_release(&heap_lock);
+        return 0;
+    }
     
     size = (size + 7) & ~7;
     heap_node_t *curr = head;

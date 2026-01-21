@@ -1,12 +1,12 @@
 # Valen Changelog
 
-## Version 1.0.0 - Initial Shell Implementation
+## Version 1.0.0
 
 - Basic shell interface with prompt "valen >> "
 - Command processing system
 - Basic input handling
 
-## Version 1.0.1 - Shell Fixes & Improvements
+## Version 1.0.1
 
 ### Fixed Issues:
 
@@ -30,3 +30,45 @@
 - **Keyboard Driver**: Improved scancode processing to separate special keys from ASCII character mapping
 
 _Note: Version 1.0.1 represents the stable shell implementation with all critical input/output bugs resolved._
+
+## Version 1.1.0
+
+### Major Features:
+
+**Multitasking System:**
+
+- Implemented complete task switching mechanism with process control blocks
+- Added round-robin task scheduler with proper context switching
+- Created x86_64 assembly context switch with register preservation
+- Added process states (running, ready, blocked, terminated)
+- Integrated shell as first system task
+- Fixed stack allocation (3072 bytes) for optimal memory usage
+
+**Timer System:**
+
+- Implemented Programmable Interval Timer (PIT) driver
+- Added hardware timer interrupt handler with proper EOI handling
+- Created 10Hz timer interrupts for preemptive scheduling
+- Integrated timer tick counter with task scheduler
+- Fixed duplicate timer ISR definition causing system hangs
+
+**Memory Management:**
+
+- Fixed heap allocation with static 4KB heap area
+- Resolved VMM memory mapping issues
+- Improved task stack allocation and management
+
+**Code Cleanup:**
+
+- Removed all debug/temp/demo code
+- Eliminated Linux references from comments
+- Cleaned up interrupt handler implementations
+- Optimized timer frequency for stable operation
+
+### Technical Improvements:
+
+- **Context Switch:** Fixed assembly register saving/restoring
+- **Timer Interrupt:** Resolved C/assembly ISR conflicts
+- **Heap System:** Replaced dynamic allocation with static heap
+- **Task Creation:** Simplified and stabilized task initialization
+- **Scheduler:** Improved first-task switching logic

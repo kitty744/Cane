@@ -24,6 +24,9 @@ void print_binary(uint64_t num);
 void print_backspace();
 void print_newline();
 
+// String to number conversion
+int atoi(const char *str);
+
 void serial_write(char *s);
 void serial_write_int(uint64_t n);
 void serial_write_hex(uint32_t n);

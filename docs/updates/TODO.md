@@ -4,20 +4,20 @@
 
 ### Multitasking
 
-- [ ] Implement basic task switching mechanism
-- [ ] Add process control block (PCB) structure
-- [ ] Create task scheduler with round-robin algorithm
-- [ ] Implement context switching for x86_64
-- [ ] Add process states (running, ready, blocked, terminated)
+- [x] Implement basic task switching mechanism
+- [x] Add process control block (PCB) structure
+- [x] Create task scheduler with round-robin algorithm
+- [x] Implement context switching for x86_64
+- [x] Add process states (running, ready, blocked, terminated)
 - [ ] Create system calls for process management
 
 ### Timer System
 
-- [ ] Initialize hardware timer (PIT)
-- [ ] Implement timer interrupt handler
-- [ ] Add timer tick counter for scheduling
+- [x] Initialize hardware timer (PIT)
+- [x] Implement timer interrupt handler
+- [x] Add timer tick counter for scheduling
 - [ ] Create sleep/delay functions
-- [ ] Integrate timer with task scheduler
+- [x] Integrate timer with task scheduler
 
 ### Memory Management
 

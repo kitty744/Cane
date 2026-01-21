@@ -54,6 +54,7 @@ void *vmm_alloc(uint64_t pages, uint64_t flags)
     static uintptr_t next_alloc_addr = 0xFFFFFFFFB0000000;
 
     uintptr_t start_addr = next_alloc_addr;
+    
     for (uint64_t i = 0; i < pages; i++)
     {
         void *phys = pmm_alloc_page();

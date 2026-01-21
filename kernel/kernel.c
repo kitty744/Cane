@@ -9,6 +9,8 @@
 #include <valen/heap.h>
 #include <valen/shell.h>
 #include <valen/keyboard.h>
+#include <valen/task.h>
+#include <valen/pit.h>
  
 int system_ready = 0;
  
@@ -84,17 +86,29 @@ void kmain(unsigned long magic, unsigned long addr)
     vmm_init();
     heap_init();
     keyboard_init();
+    pit_init(50);  // 50Hz timer for responsive scheduling
+    scheduler_init();
+    
+    // Create shell task
+    task_t *shell_task = task_create(shell_task_main, "shell");
+    if (!shell_task) {
+        printf("Failed to create shell task!\n");
+        while (1) asm volatile("hlt");
+    }
 
     set_color(COLOR_DARK_GREY);
-    printf("Type 'help' to begin.\n");
+    puts("Type 'help' to begin.\n");
     set_color(COLOR_GREEN);
-    shell_init();
     
     system_ready = 1;
     
     /* Enable CPU interrupts */
     asm volatile ("sti");
 
+    // Start the scheduler with the first task
+    schedule();
+    
+    // Kernel should never reach here - tasks run via scheduler
     while (1) {
         asm volatile ("hlt");
     }
