@@ -1,5 +1,5 @@
-#ifndef CANE_STRING_H
-#define CANE_STRING_H
+#ifndef Valen_STRING_H
+#define Valen_STRING_H
 
 #include <stdint.h>
 

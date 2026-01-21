@@ -1,5 +1,5 @@
-#ifndef CANE_KERNEL_H
-#define CANE_KERNEL_H
+#ifndef Valen_KERNEL_H
+#define Valen_KERNEL_H
 
 #include <stdint.h>
 

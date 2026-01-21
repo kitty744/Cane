@@ -1,4 +1,4 @@
-mainmenu "CaneOS Configuration"
+mainmenu "ValenOS Configuration"
 
 menu "Processor and Memory"
     config MEM_SIZE

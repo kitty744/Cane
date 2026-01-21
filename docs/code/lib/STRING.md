@@ -1,6 +1,6 @@
 # String Library
 
-The String library provides essential string manipulation and memory operations for CaneOS kernel development.
+The String library provides essential string manipulation and memory operations for ValenOS kernel development.
 
 ## Overview
 
@@ -9,13 +9,13 @@ The String library implements basic string and memory functions needed for kerne
 ## Quick Start
 
 ```c
-#include <cane/string.h>
+#include <Valen/string.h>
 
 void kernel_main(void) {
     char buffer[256];
 
     // String operations
-    strcpy(buffer, "Hello, CaneOS!");
+    strcpy(buffer, "Hello, ValenOS!");
 
     // Length operations
     int len = strlen(buffer);
@@ -309,8 +309,8 @@ spinlock_release(&string_lock);
 ## Integration Example
 
 ```c
-#include <cane/string.h>
-#include <cane/stdio.h>
+#include <Valen/string.h>
+#include <Valen/stdio.h>
 
 void process_command(const char *command) {
     char buffer[128];
@@ -338,7 +338,7 @@ void memory_example(void) {
         memset(data, 0, 1024);
 
         // Copy pattern
-        char pattern[] = "CaneOS";
+        char pattern[] = "ValenOS";
         memcpy(data, pattern, sizeof(pattern));
 
         // Use data...

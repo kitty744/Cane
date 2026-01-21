@@ -1,7 +1,7 @@
 
-#include <cane/paging.h>
-#include <cane/pmm.h>
-#include <cane/spinlock.h>
+#include <Valen/paging.h>
+#include <Valen/pmm.h>
+#include <Valen/spinlock.h>
 
 /* The offset used to access physical memory in the higher half */
 #define KERNEL_VIRT_OFFSET 0xFFFFFFFF80000000

@@ -1,10 +1,10 @@
 # Boot Process
 
-The CaneOS boot process handles system initialization from bootloader handoff to kernel startup.
+The ValenOS boot process handles system initialization from bootloader handoff to kernel startup.
 
 ## Overview
 
-CaneOS uses the Multiboot2 specification for bootloader compatibility. The boot process initializes hardware, sets up memory management, establishes interrupt handling, and starts the shell interface.
+ValenOS uses the Multiboot2 specification for bootloader compatibility. The boot process initializes hardware, sets up memory management, establishes interrupt handling, and starts the shell interface.
 
 ## Boot Sequence
 
@@ -13,7 +13,7 @@ CaneOS uses the Multiboot2 specification for bootloader compatibility. The boot 
 The kernel entry point is the `kmain` function which receives the multiboot magic number and info structure:
 
 ```c
-#include <cane/kernel.h>
+#include <Valen/kernel.h>
 
 void kmain(unsigned long magic, unsigned long addr)
 {
@@ -249,17 +249,17 @@ if (magic != MULTIBOOT2_BOOTLOADER_MAGIC)
 ## Integration Example
 
 ```c
-#include <cane/kernel.h>
-#include <cane/stdio.h>
-#include <cane/color.h>
-#include <cane/multiboot.h>
-#include <cane/idt.h>
-#include <cane/gdt.h>
-#include <cane/pmm.h>
-#include <cane/vmm.h>
-#include <cane/heap.h>
-#include <cane/shell.h>
-#include <cane/keyboard.h>
+#include <Valen/kernel.h>
+#include <Valen/stdio.h>
+#include <Valen/color.h>
+#include <Valen/multiboot.h>
+#include <Valen/idt.h>
+#include <Valen/gdt.h>
+#include <Valen/pmm.h>
+#include <Valen/vmm.h>
+#include <Valen/heap.h>
+#include <Valen/shell.h>
+#include <Valen/keyboard.h>
 
 void kmain(unsigned long magic, unsigned long addr)
 {

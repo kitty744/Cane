@@ -1,14 +1,14 @@
-#include <cane/kernel.h>
-#include <cane/stdio.h>
-#include <cane/color.h>
-#include <cane/multiboot.h>
-#include <cane/idt.h>
-#include <cane/gdt.h>
-#include <cane/pmm.h>
-#include <cane/vmm.h>
-#include <cane/heap.h>
-#include <cane/shell.h>
-#include <cane/keyboard.h>
+#include <Valen/kernel.h>
+#include <Valen/stdio.h>
+#include <Valen/color.h>
+#include <Valen/multiboot.h>
+#include <Valen/idt.h>
+#include <Valen/gdt.h>
+#include <Valen/pmm.h>
+#include <Valen/vmm.h>
+#include <Valen/heap.h>
+#include <Valen/shell.h>
+#include <Valen/keyboard.h>
  
 int system_ready = 0;
  

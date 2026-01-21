@@ -1,8 +1,8 @@
-#include <cane/heap.h>
-#include <cane/vmm.h>
-#include <cane/pmm.h>
-#include <cane/stdio.h>
-#include <cane/spinlock.h>
+#include <Valen/heap.h>
+#include <Valen/vmm.h>
+#include <Valen/pmm.h>
+#include <Valen/stdio.h>
+#include <Valen/spinlock.h>
 
 #define HEAP_MAGIC 0x12345678
 

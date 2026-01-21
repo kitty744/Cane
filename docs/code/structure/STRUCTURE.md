@@ -1,10 +1,10 @@
 ## Project Structure
 
 ```
-cane/
+Valen/
 ├── arch/x86_64/         # Architecture-specific code
 ├── drivers/             # Device drivers
-├── include/cane/        # Public headers
+├── include/Valen/        # Public headers
 ├── kernel/              # Core kernel implementation
 ├── lib/                 # Standard library
 ├── mm/                  # Memory management

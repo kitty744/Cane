@@ -1,12 +1,12 @@
 /**
  * @file keyboard.c
- * @brief PS/2 Keyboard Driver for CaneOS.
+ * @brief PS/2 Keyboard Driver for ValenOS.
  */
 
-#include <cane/keyboard.h>
-#include <cane/io.h>
-#include <cane/shell.h>
-#include <cane/pic.h>
+#include <Valen/keyboard.h>
+#include <Valen/io.h>
+#include <Valen/shell.h>
+#include <Valen/pic.h>
 
 extern int system_ready;
 

@@ -1,18 +1,18 @@
 # Memory Management
 
-The Memory Management system provides physical memory allocation, virtual memory management, and kernel heap allocation for CaneOS.
+The Memory Management system provides physical memory allocation, virtual memory management, and kernel heap allocation for ValenOS.
 
 ## Overview
 
-CaneOS uses a four-tier memory management system: Physical Memory Manager (PMM) for tracking physical pages, Paging system for hardware page table management, Virtual Memory Manager (VMM) for address translation, and a kernel heap for dynamic allocation.
+ValenOS uses a four-tier memory management system: Physical Memory Manager (PMM) for tracking physical pages, Paging system for hardware page table management, Virtual Memory Manager (VMM) for address translation, and a kernel heap for dynamic allocation.
 
 ## Quick Start
 
 ```c
-#include <cane/pmm.h>
-#include <cane/vmm.h>
-#include <cane/heap.h>
-#include <cane/paging.h>
+#include <Valen/pmm.h>
+#include <Valen/vmm.h>
+#include <Valen/heap.h>
+#include <Valen/paging.h>
 
 void kernel_main(void) {
     // Initialize memory management
@@ -490,10 +490,10 @@ void robust_memory_allocation(void) {
 ## Integration Example
 
 ```c
-#include <cane/pmm.h>
-#include <cane/vmm.h>
-#include <cane/heap.h>
-#include <cane/paging.h>
+#include <Valen/pmm.h>
+#include <Valen/vmm.h>
+#include <Valen/heap.h>
+#include <Valen/paging.h>
 
 void init_memory_subsystem(void) {
     // Initialize PMM with memory map from bootloader

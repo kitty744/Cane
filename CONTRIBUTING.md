@@ -1,16 +1,16 @@
-# Contributing to CaneOS
+# Contributing to ValenOS
 
-Thank you for your interest in CaneOS! Developing a kernel requires strict adherence to memory safety and code style to prevent system-wide instability.
+Thank you for your interest in ValenOS! Developing a kernel requires strict adherence to memory safety and code style to prevent system-wide instability.
 
 ## 1. Code Style
 
 - **Naming:** All core kernel functions should be lowercase and descriptive.
-- **Headers:** Always include the relevant `<cane/xxx.h>` headers.
+- **Headers:** Always include the relevant `<Valen/xxx.h>` headers.
 - **Indentation:** Use 4 spaces for indentation (no tabs).
 
 ## 2. Memory Management (The Golden Rules)
 
-CaneOS uses a custom heap and VMM. To keep the system stable:
+ValenOS uses a custom heap and VMM. To keep the system stable:
 
 - **NULL Checks:** Every `malloc()` or `vmm_alloc()` call **MUST** be followed by a NULL check.
 - **Locking:** If you acquire the `heap_lock` or any `spinlock_t`, you must release it on every possible exit path of the function.

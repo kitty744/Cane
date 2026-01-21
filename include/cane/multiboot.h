@@ -1,5 +1,5 @@
-#ifndef CANE_MULTIBOOT_H
-#define CANE_MULTIBOOT_H
+#ifndef Valen_MULTIBOOT_H
+#define Valen_MULTIBOOT_H
 
 #include <stdint.h>
 

@@ -4,7 +4,7 @@
 
 # --- 1. DEPENDENCY CHECK & AUTO-INSTALLER ---
 check_and_install() {
-    # Core binaries needed for CaneOS
+    # Core binaries needed for ValenOS
     DEPS=("qemu-system-x86_64" "nasm" "x86_64-elf-gcc" "grub-mkrescue" "xorriso" "kconfig-mconf" "coccinelle")
     MISSING=()
 

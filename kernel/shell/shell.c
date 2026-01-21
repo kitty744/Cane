@@ -1,20 +1,20 @@
 /**
  * @file shell.c
- * @brief CaneOS Interactive Shell
+ * @brief ValenOS Interactive Shell
  * * Provides a command-line interface for system interaction. This module
  * manages a local input buffer, handles character insertion/deletion,
  * and interfaces with the VGA driver to provide a flicker-free experience
  * through hardware cursor masking and coordinate math.
  */
 
-#include <cane/stdio.h>
-#include <cane/string.h>
-#include <cane/io.h>
-#include <cane/pmm.h>
-#include <cane/heap.h>
+#include <Valen/stdio.h>
+#include <Valen/string.h>
+#include <Valen/io.h>
+#include <Valen/pmm.h>
+#include <Valen/heap.h>
 
 #define MAX_BUFFER 256
-#define PROMPT "Cane >> "
+#define PROMPT "Valen >> "
 #define PROMPT_LEN 8
 
 static char input_buffer[MAX_BUFFER];

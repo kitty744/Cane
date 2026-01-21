@@ -7,10 +7,10 @@
  * addresses before access.
  */
 
-#include <cane/paging.h>
-#include <cane/pmm.h>
-#include <cane/stdio.h>
-#include <cane/spinlock.h>
+#include <Valen/paging.h>
+#include <Valen/pmm.h>
+#include <Valen/stdio.h>
+#include <Valen/spinlock.h>
 
 /** * @brief The offset to shift physical addresses into the higher half.
  * Must match the value in boot.s and linker.ld.

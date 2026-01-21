@@ -1,10 +1,10 @@
 # Device Drivers
 
-The Device Driver system in CaneOS provides basic hardware support for essential input devices.
+The Device Driver system in ValenOS provides basic hardware support for essential input devices.
 
 ## Overview
 
-CaneOS currently includes a simple driver system focused on essential kernel functionality. The primary driver implemented is the PS/2 keyboard driver, which provides input for the shell interface.
+ValenOS currently includes a simple driver system focused on essential kernel functionality. The primary driver implemented is the PS/2 keyboard driver, which provides input for the shell interface.
 
 ## Available Drivers
 
@@ -13,7 +13,7 @@ CaneOS currently includes a simple driver system focused on essential kernel fun
 The keyboard driver handles PS/2 keyboard input and converts scancodes to ASCII characters.
 
 ```c
-#include <cane/keyboard.h>
+#include <Valen/keyboard.h>
 
 // Initialize the keyboard driver
 keyboard_init();
@@ -74,7 +74,7 @@ default:
 Drivers use the I/O port functions for hardware communication:
 
 ```c
-#include <cane/io.h>
+#include <Valen/io.h>
 
 // Read from I/O ports
 uint8_t status = inb(0x64);    // Read keyboard status
@@ -89,7 +89,7 @@ outb(0x64, command);  // Send command to keyboard
 The keyboard driver uses the PIC (Programmable Interrupt Controller):
 
 ```c
-#include <cane/pic.h>
+#include <Valen/pic.h>
 
 // Enable keyboard interrupt
 pic_irq_enable(IRQ_KEYBOARD);
@@ -102,7 +102,7 @@ pic_send_eoi(IRQ_KEYBOARD);
 
 ### Initialization Pattern
 
-Most drivers in CaneOS follow this initialization pattern:
+Most drivers in ValenOS follow this initialization pattern:
 
 ```c
 void driver_init(void) {
@@ -140,9 +140,9 @@ void driver_handler(void) {
 
 ### Basic Driver Template
 
-To add a new driver to CaneOS:
+To add a new driver to ValenOS:
 
-1. **Create header file** (`include/cane/new_device.h`):
+1. **Create header file** (`include/Valen/new_device.h`):
 
 ```c
 #ifndef NEW_DEVICE_H
@@ -159,9 +159,9 @@ void new_device_handler(void);
 2. **Create implementation** (`drivers/new_device.c`):
 
 ```c
-#include <cane/new_device.h>
-#include <cane/io.h>
-#include <cane/pic.h>
+#include <Valen/new_device.h>
+#include <Valen/io.h>
+#include <Valen/pic.h>
 
 void new_device_init(void) {
     // Initialize hardware
@@ -179,7 +179,7 @@ void new_device_handler(void) {
 
 ```c
 // In kernel.c:
-#include <cane/new_device.h>
+#include <Valen/new_device.h>
 
 void kmain(unsigned long magic, unsigned long addr) {
     // ... existing initialization ...
@@ -211,8 +211,8 @@ Planned driver improvements:
 ## Integration Example
 
 ```c
-#include <cane/keyboard.h>
-#include <cane/stdio.h>
+#include <Valen/keyboard.h>
+#include <Valen/stdio.h>
 
 void input_example(void) {
     printf("Press any key to continue...\n");

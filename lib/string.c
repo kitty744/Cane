@@ -1,4 +1,4 @@
-#include <cane/string.h>
+#include <Valen/string.h>
 
 void *memset(void *ptr, int value, uint64_t num) {
     uint8_t *p = (uint8_t *)ptr;

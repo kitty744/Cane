@@ -1,22 +1,22 @@
 # STDIO Library
 
-The STDIO library provides VGA text mode output, serial communication, and formatted printing capabilities for CaneOS.
+The STDIO library provides VGA text mode output, serial communication, and formatted printing capabilities for ValenOS.
 
 ## Overview
 
-The STDIO library is the primary interface for kernel output in CaneOS. It supports both VGA text mode display for user interaction and serial port output for debugging. The library includes a powerful printf implementation with extensive formatting options.
+The STDIO library is the primary interface for kernel output in ValenOS. It supports both VGA text mode display for user interaction and serial port output for debugging. The library includes a powerful printf implementation with extensive formatting options.
 
 ## Quick Start
 
 ```c
-#include "cane/stdio.h"
+#include "Valen/stdio.h"
 
 void kernel_main(void) {
     // Set text color (optional)
     set_color(0x0F); // White text on black background
 
     // Basic output
-    printf("Hello, CaneOS!\n");
+    printf("Hello, ValenOS!\n");
 
     // Formatted output
     printf("System initialized: %d MB RAM\n", memory_size);
@@ -57,10 +57,10 @@ int y = get_cursor_y();
 
 ### Color Support
 
-Use the color definitions from "cane/color.h" for consistent color management:
+Use the color definitions from "Valen/color.h" for consistent color management:
 
 ```c
-#include "cane/color.h"
+#include "Valen/color.h"
 
 // Basic colors
 set_color(COLOR_WHITE);              // Default white text
@@ -176,8 +176,8 @@ The STDIO library is designed to be robust:
 ## Integration Example
 
 ```c
-#include "cane/stdio.h"
-#include "cane/color.h"
+#include "Valen/stdio.h"
+#include "Valen/color.h"
 
 void init_display(void) {
     // Initialize display system
@@ -187,7 +187,7 @@ void init_display(void) {
     // Set up status bar
     set_cursor(0, 0);
     set_color(COLOR_BLACK | COLOR_BG_LIGHT_GREY);
-    printf("CaneOS v1.0 - Ready");
+    printf("ValenOS v1.0 - Ready");
 
     // Reset to user area
     set_color(COLOR_WHITE | COLOR_BG_BLACK);

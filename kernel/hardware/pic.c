@@ -1,6 +1,6 @@
-#include <cane/pic.h>
-#include <cane/io.h>
-#include <cane/spinlock.h>
+#include <Valen/pic.h>
+#include <Valen/io.h>
+#include <Valen/spinlock.h>
 
 static spinlock_t pic_lock = SPINLOCK_INIT;
 

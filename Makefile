@@ -13,8 +13,8 @@ BINDIR = bin
 KERNEL_SRCS = $(shell find . -name '*.c' -o -name '*.s' | grep -v 'iso\|bin\|obj')
 KERNEL_OBJS = $(patsubst %.s,$(OBJDIR)/%.o,$(patsubst %.c,$(OBJDIR)/%.o,$(KERNEL_SRCS)))
 
-KERNEL_BIN = $(BINDIR)/caneos.bin
-KERNEL_ISO = $(BINDIR)/caneos.iso
+KERNEL_BIN = $(BINDIR)/Valenos.bin
+KERNEL_ISO = $(BINDIR)/Valenos.iso
 
 -include .config
 
@@ -22,11 +22,11 @@ all: $(KERNEL_ISO)
 
 $(KERNEL_ISO): $(KERNEL_BIN)
 	mkdir -p isofiles/boot/grub
-	cp $(KERNEL_BIN) isofiles/boot/caneos.bin
+	cp $(KERNEL_BIN) isofiles/boot/Valenos.bin
 	echo 'set timeout=0' > isofiles/boot/grub/grub.cfg
 	echo 'set default=0' >> isofiles/boot/grub/grub.cfg
-	echo 'menuentry "CaneOS" {' >> isofiles/boot/grub/grub.cfg
-	echo '    multiboot2 /boot/caneos.bin' >> isofiles/boot/grub/grub.cfg
+	echo 'menuentry "ValenOS" {' >> isofiles/boot/grub/grub.cfg
+	echo '    multiboot2 /boot/Valenos.bin' >> isofiles/boot/grub/grub.cfg
 	echo '    boot' >> isofiles/boot/grub/grub.cfg
 	echo '}' >> isofiles/boot/grub/grub.cfg
 	grub-mkrescue -o $(KERNEL_ISO) isofiles

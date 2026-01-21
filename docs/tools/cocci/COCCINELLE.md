@@ -1,6 +1,6 @@
 # Semantic Patching with Coccinelle (spatch)
 
-To maintain the stability of the CaneOS kernel, we use **Coccinelle** for static analysis. This allows us to find complex logic bugs, such as memory leaks and spinlock deadlocks, that standard compilers like GCC cannot detect.
+To maintain the stability of the ValenOS kernel, we use **Coccinelle** for static analysis. This allows us to find complex logic bugs, such as memory leaks and spinlock deadlocks, that standard compilers like GCC cannot detect.
 
 ## 1. Configuration
 

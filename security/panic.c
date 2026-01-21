@@ -1,7 +1,7 @@
 #include <stdint.h>
-#include <cane/stdio.h>
-#include <cane/panic.h>
-#include <cane/color.h>
+#include <Valen/stdio.h>
+#include <Valen/panic.h>
+#include <Valen/color.h>
 
 /**
  * @brief Panic-level Page Fault Handler.

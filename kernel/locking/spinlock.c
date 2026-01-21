@@ -1,4 +1,4 @@
-#include <cane/spinlock.h>
+#include <Valen/spinlock.h>
 
 void spinlock_init(spinlock_t *lock)
 {

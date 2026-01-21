@@ -23,7 +23,7 @@ if [ "$CONFIG_AUDIO_ENABLED" = "y" ]; then
 fi
 
 # --- 2. BUILD & RUN ---
-echo "[INFO]: Cleaning and Building CaneOS..."
+echo "[INFO]: Cleaning and Building ValenOS..."
 make clean && make all
 
 echo "[INFO]: Launching QEMU ($Q_ARCH | $Q_CPU | $Q_MEM RAM)"
@@ -36,7 +36,7 @@ qemu-system-x86_64 \
     -vga $Q_VGA \
     -d $Q_DEBUG \
     -serial stdio \
-    -cdrom bin/caneos.iso \
+    -cdrom bin/Valenos.iso \
     $Q_AUDIO \
     $EXTRA_ARGS
 

@@ -1,15 +1,15 @@
 /**
  * @file idt.c
- * @brief Interrupt Descriptor Table (IDT) Management for CaneOS.
+ * @brief Interrupt Descriptor Table (IDT) Management for ValenOS.
  *
  * This module initializes the IDT, which is the mechanism the x86_64 CPU uses
  * to handle exceptions and hardware interrupts. It maps assembly-level
  * Interrupt Service Routine (ISR) stubs to their respective vectors.
  */
 
-#include <cane/idt.h>
-#include <cane/pic.h>
-#include <cane/keyboard.h>
+#include <Valen/idt.h>
+#include <Valen/pic.h>
+#include <Valen/keyboard.h>
 
 /* --- Global IDT Structures --- */
 
