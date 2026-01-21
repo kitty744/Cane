@@ -86,6 +86,9 @@ set_color(COLOR_BRIGHT_BLUE);        // Bright blue
 // Custom combinations
 uint8_t custom_color = COLOR_GREEN | COLOR_BG_BLUE | COLOR_BRIGHT;
 set_color(custom_color);
+
+// Get current color
+uint8_t current_color = get_color();
 ```
 
 ### Cursor Control
@@ -198,6 +201,48 @@ The STDIO library is designed to be robust:
 - Serial operations are protected against concurrent access
 - Invalid format specifiers are handled gracefully
 - Cursor operations are bounded to screen dimensions
+
+## Function Reference
+
+### Color Functions
+
+#### set_color
+
+```c
+void set_color(uint8_t color);
+```
+
+Sets the global text color for all subsequent character output.
+
+**Parameters:**
+
+- `color`: Color attribute (foreground + background + brightness)
+
+#### get_color
+
+```c
+uint8_t get_color(void);
+```
+
+Returns the current global text color.
+
+**Returns:**
+
+- Current color attribute
+
+**Example:**
+
+```c
+// Save current color
+uint8_t old_color = get_color();
+
+// Set temporary color
+set_color(COLOR_GREEN);
+printf("This is green\n");
+
+// Restore original color
+set_color(old_color);
+```
 
 ## Best Practices
 

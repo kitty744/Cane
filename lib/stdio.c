@@ -6,6 +6,7 @@
 #include <valen/stdio.h>
 #include <valen/io.h>
 #include <valen/spinlock.h>
+#include <valen/color.h>
 
 /* Higher Half Virtual Address for VGA Buffer */
 #define VIRT_ADDR 0xFFFFFFFF800B8000
@@ -15,7 +16,7 @@ static int cursor_x = 0;
 static int cursor_y = 0;
 const int width = 80;
 const int height = 25;
-static uint8_t terminal_attribute = 0x0F;
+static uint8_t terminal_attribute = COLOR_GREEN;
 
 static spinlock_t lock = SPINLOCK_INIT;
 
@@ -25,6 +26,11 @@ static spinlock_t lock = SPINLOCK_INIT;
 void set_color(uint8_t color)
 {
     terminal_attribute = color;
+}
+
+uint8_t get_color(void)
+{
+    return terminal_attribute;
 }
 
 /**

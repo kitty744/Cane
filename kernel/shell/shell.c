@@ -14,6 +14,7 @@
 #include <valen/heap.h>
 #include <valen/task.h>
 #include <valen/spinlock.h>
+#include <valen/color.h>
 
 #define MAX_BUFFER 256
 #define PROMPT "valen >> "

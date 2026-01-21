@@ -41,5 +41,6 @@ void hide_hardware_cursor();
 void show_hardware_cursor();
 
 void set_color(uint8_t color);
+uint8_t get_color(void);
 
 #endif
