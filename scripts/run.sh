@@ -36,7 +36,7 @@ qemu-system-x86_64 \
     -vga $Q_VGA \
     -d $Q_DEBUG \
     -serial stdio \
-    -cdrom bin/Valen.iso \
+    -cdrom bin/valen.iso \
     $Q_AUDIO \
     $EXTRA_ARGS
 

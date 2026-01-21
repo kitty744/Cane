@@ -13,8 +13,8 @@ BINDIR = bin
 KERNEL_SRCS = $(shell find . -name '*.c' -o -name '*.s' | grep -v 'iso\|bin\|obj')
 KERNEL_OBJS = $(patsubst %.s,$(OBJDIR)/%.o,$(patsubst %.c,$(OBJDIR)/%.o,$(KERNEL_SRCS)))
 
-KERNEL_BIN = $(BINDIR)/Valen.bin
-KERNEL_ISO = $(BINDIR)/Valen.iso
+KERNEL_BIN = $(BINDIR)/valen.bin
+KERNEL_ISO = $(BINDIR)/valen.iso
 
 -include .config
 
@@ -22,11 +22,11 @@ all: $(KERNEL_ISO)
 
 $(KERNEL_ISO): $(KERNEL_BIN)
 	mkdir -p isofiles/boot/grub
-	cp $(KERNEL_BIN) isofiles/boot/Valen.bin
+	cp $(KERNEL_BIN) isofiles/boot/valen.bin
 	echo 'set timeout=0' > isofiles/boot/grub/grub.cfg
 	echo 'set default=0' >> isofiles/boot/grub/grub.cfg
-	echo 'menuentry "Valen" {' >> isofiles/boot/grub/grub.cfg
-	echo '    multiboot2 /boot/Valen.bin' >> isofiles/boot/grub/grub.cfg
+	echo 'menuentry "valen" {' >> isofiles/boot/grub/grub.cfg
+	echo '    multiboot2 /boot/valen.bin' >> isofiles/boot/grub/grub.cfg
 	echo '    boot' >> isofiles/boot/grub/grub.cfg
 	echo '}' >> isofiles/boot/grub/grub.cfg
 	grub-mkrescue -o $(KERNEL_ISO) isofiles

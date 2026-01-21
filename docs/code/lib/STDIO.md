@@ -9,7 +9,7 @@ The STDIO library is the primary interface for kernel output in Valen. It suppor
 ## Quick Start
 
 ```c
-#include <valen/stdio.h"
+#include <valen/stdio.h>
 
 void kernel_main(void) {
     // Set text color (optional)
@@ -60,7 +60,7 @@ int y = get_cursor_y();
 Use the color definitions from "Valen/color.h" for consistent color management:
 
 ```c
-#include <valen/color.h"
+#include <valen/color.h>
 
 // Basic colors
 set_color(COLOR_WHITE);              // Default white text
@@ -176,8 +176,8 @@ The STDIO library is designed to be robust:
 ## Integration Example
 
 ```c
-#include <valen/stdio.h"
-#include <valen/color.h"
+#include <valen/stdio.h>
+#include <valen/color.h>
 
 void init_display(void) {
     // Initialize display system

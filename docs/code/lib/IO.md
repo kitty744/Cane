@@ -9,7 +9,7 @@ The I/O library enables direct communication with hardware devices through port-
 ## Quick Start
 
 ```c
-#include <valen/io.h"
+#include <valen/io.h>
 
 void init_vga(void) {
     // Read VGA controller state
@@ -196,7 +196,7 @@ uint8_t rtc_get_hours(void) {
 ## Integration Example
 
 ```c
-#include <valen/io.h"
+#include <valen/io.h>
 
 void init_hardware(void) {
     // Initialize serial port for debugging
