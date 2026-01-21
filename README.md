@@ -1,5 +1,7 @@
 # Valen
 
+![Valen](assets/logo/valen.png)
+
 A modern x86_64 operating system built from scratch with comprehensive hardware compatibility and a retro GUI aesthetic.
 
 ## Overview
