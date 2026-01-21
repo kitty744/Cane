@@ -3,10 +3,10 @@
  * @brief PS/2 Keyboard Driver for Valen.
  */
 
-#include <Valen/keyboard.h>
-#include <Valen/io.h>
-#include <Valen/shell.h>
-#include <Valen/pic.h>
+#include <valen/keyboard.h>
+#include <valen/io.h>
+#include <valen/shell.h>
+#include <valen/pic.h>
 
 extern int system_ready;
 

@@ -9,10 +9,10 @@ Valen uses a four-tier memory management system: Physical Memory Manager (PMM) f
 ## Quick Start
 
 ```c
-#include <Valen/pmm.h>
-#include <Valen/vmm.h>
-#include <Valen/heap.h>
-#include <Valen/paging.h>
+#include <valen/pmm.h>
+#include <valen/vmm.h>
+#include <valen/heap.h>
+#include <valen/paging.h>
 
 void kernel_main(void) {
     // Initialize memory management
@@ -490,10 +490,10 @@ void robust_memory_allocation(void) {
 ## Integration Example
 
 ```c
-#include <Valen/pmm.h>
-#include <Valen/vmm.h>
-#include <Valen/heap.h>
-#include <Valen/paging.h>
+#include <valen/pmm.h>
+#include <valen/vmm.h>
+#include <valen/heap.h>
+#include <valen/paging.h>
 
 void init_memory_subsystem(void) {
     // Initialize PMM with memory map from bootloader

@@ -1,4 +1,4 @@
-#include <Valen/string.h>
+#include <valen/string.h>
 
 void *memset(void *ptr, int value, uint64_t num) {
     uint8_t *p = (uint8_t *)ptr;

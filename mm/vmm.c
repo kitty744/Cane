@@ -3,11 +3,11 @@
  * @brief Virtual Memory Manager (VMM) Implementation (Higher Half).
  */
 
-#include <Valen/vmm.h>
-#include <Valen/paging.h>
-#include <Valen/pmm.h>
-#include <Valen/stdio.h>
-#include <Valen/spinlock.h>
+#include <valen/vmm.h>
+#include <valen/paging.h>
+#include <valen/pmm.h>
+#include <valen/stdio.h>
+#include <valen/spinlock.h>
 
 #define KERNEL_VIRT_OFFSET 0xFFFFFFFF80000000ULL
 

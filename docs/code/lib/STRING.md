@@ -9,7 +9,7 @@ The String library implements basic string and memory functions needed for kerne
 ## Quick Start
 
 ```c
-#include <Valen/string.h>
+#include <valen/string.h>
 
 void kernel_main(void) {
     char buffer[256];
@@ -309,8 +309,8 @@ spinlock_release(&string_lock);
 ## Integration Example
 
 ```c
-#include <Valen/string.h>
-#include <Valen/stdio.h>
+#include <valen/string.h>
+#include <valen/stdio.h>
 
 void process_command(const char *command) {
     char buffer[128];

@@ -1,4 +1,4 @@
-#include <Valen/gdt.h>
+#include <valen/gdt.h>
 
 struct gdt_entry gdt[3];
 struct gdt_ptr gp;

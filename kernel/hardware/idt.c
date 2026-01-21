@@ -7,9 +7,9 @@
  * Interrupt Service Routine (ISR) stubs to their respective vectors.
  */
 
-#include <Valen/idt.h>
-#include <Valen/pic.h>
-#include <Valen/keyboard.h>
+#include <valen/idt.h>
+#include <valen/pic.h>
+#include <valen/keyboard.h>
 
 /* --- Global IDT Structures --- */
 

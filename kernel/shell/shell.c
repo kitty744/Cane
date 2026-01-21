@@ -7,11 +7,11 @@
  * through hardware cursor masking and coordinate math.
  */
 
-#include <Valen/stdio.h>
-#include <Valen/string.h>
-#include <Valen/io.h>
-#include <Valen/pmm.h>
-#include <Valen/heap.h>
+#include <valen/stdio.h>
+#include <valen/string.h>
+#include <valen/io.h>
+#include <valen/pmm.h>
+#include <valen/heap.h>
 
 #define MAX_BUFFER 256
 #define PROMPT "Valen >> "

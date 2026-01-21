@@ -1,14 +1,14 @@
-#include <Valen/kernel.h>
-#include <Valen/stdio.h>
-#include <Valen/color.h>
-#include <Valen/multiboot.h>
-#include <Valen/idt.h>
-#include <Valen/gdt.h>
-#include <Valen/pmm.h>
-#include <Valen/vmm.h>
-#include <Valen/heap.h>
-#include <Valen/shell.h>
-#include <Valen/keyboard.h>
+#include <valen/kernel.h>
+#include <valen/stdio.h>
+#include <valen/color.h>
+#include <valen/multiboot.h>
+#include <valen/idt.h>
+#include <valen/gdt.h>
+#include <valen/pmm.h>
+#include <valen/vmm.h>
+#include <valen/heap.h>
+#include <valen/shell.h>
+#include <valen/keyboard.h>
  
 int system_ready = 0;
  

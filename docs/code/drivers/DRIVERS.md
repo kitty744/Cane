@@ -13,7 +13,7 @@ Valen currently includes a simple driver system focused on essential kernel func
 The keyboard driver handles PS/2 keyboard input and converts scancodes to ASCII characters.
 
 ```c
-#include <Valen/keyboard.h>
+#include <valen/keyboard.h>
 
 // Initialize the keyboard driver
 keyboard_init();
@@ -74,7 +74,7 @@ default:
 Drivers use the I/O port functions for hardware communication:
 
 ```c
-#include <Valen/io.h>
+#include <valen/io.h>
 
 // Read from I/O ports
 uint8_t status = inb(0x64);    // Read keyboard status
@@ -89,7 +89,7 @@ outb(0x64, command);  // Send command to keyboard
 The keyboard driver uses the PIC (Programmable Interrupt Controller):
 
 ```c
-#include <Valen/pic.h>
+#include <valen/pic.h>
 
 // Enable keyboard interrupt
 pic_irq_enable(IRQ_KEYBOARD);
@@ -159,9 +159,9 @@ void new_device_handler(void);
 2. **Create implementation** (`drivers/new_device.c`):
 
 ```c
-#include <Valen/new_device.h>
-#include <Valen/io.h>
-#include <Valen/pic.h>
+#include <valen/new_device.h>
+#include <valen/io.h>
+#include <valen/pic.h>
 
 void new_device_init(void) {
     // Initialize hardware
@@ -179,7 +179,7 @@ void new_device_handler(void) {
 
 ```c
 // In kernel.c:
-#include <Valen/new_device.h>
+#include <valen/new_device.h>
 
 void kmain(unsigned long magic, unsigned long addr) {
     // ... existing initialization ...
@@ -211,8 +211,8 @@ Planned driver improvements:
 ## Integration Example
 
 ```c
-#include <Valen/keyboard.h>
-#include <Valen/stdio.h>
+#include <valen/keyboard.h>
+#include <valen/stdio.h>
 
 void input_example(void) {
     printf("Press any key to continue...\n");
