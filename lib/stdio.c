@@ -3,9 +3,9 @@
  * @brief Standard I/O library for VGA text mode and Serial output.
  */
 
-#include "Valen/stdio.h"
-#include "Valen/io.h"
-#include "Valen/spinlock.h"
+#include <valen/stdio.h"
+#include <valen/io.h"
+#include <valen/spinlock.h"
 
 /* Higher Half Virtual Address for VGA Buffer */
 #define VIRT_ADDR 0xFFFFFFFF800B8000
