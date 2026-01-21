@@ -10,10 +10,11 @@ The STDIO library is the primary interface for kernel output in Valen. It suppor
 
 ```c
 #include <valen/stdio.h>
+#include <valen/color.h>
 
 void kernel_main(void) {
     // Set text color (optional)
-    set_color(0x0F); // White text on black background
+    set_color(COLOR_WHITE); // White text on black background
 
     // Basic output
     printf("Hello, Valen!\n");
@@ -148,37 +149,38 @@ printf("Literal %%: %%\n");
 
 ## String to Number Conversion
 
-The STDIO library provides string parsing functions:
+### atoi
 
 ```c
-// Convert string to integer
+int atoi(const char *str);
+```
+
+Converts a string to an integer.
+
+**Parameters:**
+
+- `str`: String to convert
+
+**Returns:**
+
+- Integer value of the string, or 0 for invalid input
+
+**Example:**
+
+```c
 int result = atoi("123");        // Returns 123
 int negative = atoi("-45");       // Returns -45
 int with_space = atoi("  7  ");  // Returns 7
-
-// Handle invalid input gracefully
 int invalid = atoi("abc");       // Returns 0
 ```
 
-### atoi Function Details
-
+**Function Details:**
 The `atoi` function handles:
 
 - Leading whitespace (spaces, tabs, newlines)
 - Optional sign (+ or -)
 - Digit sequences
 - Stops at first non-digit character
-
-```c
-// Examples
-atoi("123")      // 123
-atoi("-45")      // -45
-atoi("+67")      // 67
-atoi("  89 ")    // 89
-atoi("12abc34")   // 12 (stops at 'a')
-atoi("abc")       // 0
-atoi("")          // 0
-```
 
 ## Serial Communication
 
@@ -218,7 +220,7 @@ Sets the global text color for all subsequent character output.
 
 - `color`: Color attribute (foreground + background + brightness)
 
-#### get_color
+### get_color
 
 ```c
 uint8_t get_color(void);
@@ -299,5 +301,5 @@ All STDIO functions that modify shared state (VGA buffer, cursor position, seria
 
 - **VGA Buffer Address**: `0xFFFFFFFF800B8000` (Higher Half Virtual Address)
 - **Screen Dimensions**: 80 columns × 25 rows
-- **Default Color**: `0x0F` (White text on black background)
+- **Default Color**: `COLOR_GREEN` (Green text on black background)
 - **Serial Port**: COM1 (0x3f8)
