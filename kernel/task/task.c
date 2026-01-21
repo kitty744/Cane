@@ -230,3 +230,45 @@ pid_t get_current_pid(void) {
 void yield(void) {
     schedule();
 }
+
+/**
+ * @brief Find task by PID
+ */
+task_t *find_task_by_pid(pid_t pid) {
+    if (!runqueue || pid <= 0) return NULL;
+    
+    task_t *current = runqueue;
+    do {
+        if (current->pid == pid) {
+            return current;
+        }
+        current = current->next;
+    } while (current != runqueue);
+    
+    return NULL;
+}
+
+/**
+ * @brief Kill a task by PID
+ */
+int kill_task(pid_t pid) {
+    if (pid <= 0) return -1;
+    
+    task_t *target = find_task_by_pid(pid);
+    if (!target) return -1;
+    
+    // Don't allow killing current task
+    if (target == current_task) return -2;
+    
+    // Mark as zombie and remove from runqueue
+    target->state = TASK_ZOMBIE;
+    remove_task_from_runqueue(target);
+    
+    // Free the task's resources
+    if (target->stack) {
+        free(target->stack);
+    }
+    free(target);
+    
+    return 0;
+}

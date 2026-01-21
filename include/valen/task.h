@@ -105,5 +105,7 @@ void remove_task_from_runqueue(task_t *task);
 task_t *get_current_task(void);
 pid_t get_current_pid(void);
 void yield(void);
+task_t *find_task_by_pid(pid_t pid);
+int kill_task(pid_t pid);
 
 #endif // VALEN_TASK_H

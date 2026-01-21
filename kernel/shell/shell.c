@@ -77,93 +77,178 @@ static void redraw_line()
     show_hardware_cursor();
 }
 
+// Command function prototypes
+static void cmd_clear(const char *arg);
+static void cmd_help(const char *arg);
+static void cmd_mem(const char *arg);
+static void cmd_tasks(const char *arg);
+static void cmd_kill(const char *arg);
+static void cmd_reboot(const char *arg);
+
+// Command structure
+typedef struct {
+    const char *name;
+    void (*func)(const char *arg);
+    const char *help;
+} command_t;
+
+// Command array
+static const command_t commands[] = {
+    {"clear", cmd_clear, "Clear the terminal screen"},
+    {"help", cmd_help, "Display this help menu"},
+    {"mem", cmd_mem, "Show physical memory utilization"},
+    {"tasks", cmd_tasks, "List running tasks"},
+    {"kill", cmd_kill, "Kill a task (usage: kill <pid>)"},
+    {"reboot", cmd_reboot, "Restart the system via PS/2"},
+    {NULL, NULL, NULL} // Sentinel
+};
+
+/**
+ * @brief Parse command and arguments
+ */
+static void parse_command(const char *input, char *cmd, char *arg) {
+    const char *space = strchr(input, ' ');
+    if (space) {
+        size_t cmd_len = space - input;
+        strncpy(cmd, input, cmd_len);
+        cmd[cmd_len] = '\0';
+        strcpy(arg, space + 1);
+    } else {
+        strcpy(cmd, input);
+        arg[0] = '\0';
+    }
+}
+
 /**
  * @brief Logic for interpreting and executing shell commands.
- * Compares the input buffer against known commands and dispatches
- * to the appropriate kernel subsystems with formatted output.
+ * Uses a command table for cleaner dispatch and better maintainability.
  */
 void process_command(char *cmd)
 {
-    if (strcmp(cmd, "clear") == 0)
-    {
-        print_clear();
+    char cmd_name[32];
+    char cmd_arg[64];
+    
+    // Trim whitespace and parse
+    parse_command(cmd, cmd_name, cmd_arg);
+    
+    // Handle empty command
+    if (strlen(cmd_name) == 0) {
+        return;
     }
-    else if (strcmp(cmd, "help") == 0)
-    {
-        puts("\n--- Valen Command Interface ---\n");
-        puts("  help    - Display this menu\n");
-        puts("  clear   - Clear the terminal screen\n");
-        puts("  mem     - Show physical memory utilization\n");
-        puts("  tasks   - List running tasks\n");
-        puts("  kill    - Kill a task\n");
-        puts("  exit    - Exit shell task\n");
-        puts("  reboot  - Restart the system via PS/2\n");
-        puts("----------------------------------\n");
+    
+    // Search for command in table
+    for (int i = 0; commands[i].name != NULL; i++) {
+        if (strcmp(cmd_name, commands[i].name) == 0) {
+            commands[i].func(cmd_arg);
+            return;
+        }
     }
-    else if (strcmp(cmd, "mem") == 0)
-    {
-        uint64_t total = pmm_get_total_kb();
-        uint64_t used = pmm_get_used_kb();
-        uint64_t free = total - used;
+    
+    // Command not found
+    printf("Error: '%s' is not recognized as a command.\n", cmd_name);
+    printf("Type 'help' for available commands.\n");
+}
 
-        puts("\n--- Physical Memory Mapping ---\n");
-        puts("  Total: ");
-        print_int(total / 1024);
-        puts(" MB\n");
-        puts("  Used:  ");
-        print_int(used / 1024);
-        puts(" MB\n");
-        puts("  Free:  ");
-        print_int(free / 1024);
-        puts(" MB\n");
-        puts("-------------------------------\n");
+// Command implementations
+static void cmd_clear(const char *arg) {
+    (void)arg; // Unused parameter
+    print_clear();
+}
+
+static void cmd_help(const char *arg) {
+    (void)arg; // Unused parameter
+    puts("\n--- Valen Command Interface ---\n");
+    for (int i = 0; commands[i].name != NULL; i++) {
+        puts("  ");
+        puts(commands[i].name);
+        puts(" - ");
+        puts(commands[i].help);
+        puts("\n");
     }
-    else if (strcmp(cmd, "tasks") == 0)
-    {
-        puts("\n--- Running Tasks ---\n");
-        task_t *current = get_current_task();
-        if (current) {
-            printf("  PID %d: %s (State: RUNNING)\n", current->pid, current->comm);
-        } else {
-            puts("  No tasks running\n");
-        }
+    puts("----------------------------------\n");
+}
+
+static void cmd_mem(const char *arg) {
+    (void)arg; // Unused parameter
+    uint64_t total = pmm_get_total_kb();
+    uint64_t used = pmm_get_used_kb();
+    uint64_t free = total - used;
+
+    puts("\n--- Physical Memory Mapping ---\n");
+    printf("  Total: %llu MB\n", total / 1024);
+    printf("  Used:  %llu MB\n", used / 1024);
+    printf("  Free:  %llu MB\n", free / 1024);
+    puts("-------------------------------\n");
+}
+
+static void cmd_tasks(const char *arg) {
+    (void)arg; // Unused parameter
+    puts("\n--- Running Tasks ---\n");
+    
+    task_t *current = get_current_task();
+    if (!current) {
+        puts("  No tasks running\n");
         puts("---------------------\n");
+        return;
     }
-    else if (strncmp(cmd, "kill", 4) == 0)
-    {
-        char *space = strchr(cmd, ' ');
-        if (space) {
-            int pid = atoi(space + 1);
-            if (pid > 0) {
-                // Find and kill the task with the specified PID
-                task_t *current = get_current_task();
-                if (current && current->pid == pid) {
-                    printf("Cannot kill current shell task (PID %d)\n", pid);
-                } else {
-                    printf("Task with PID %d not found - kill not implemented yet\n", pid);
-                }
-            } else {
-                puts("Usage: kill <pid>\n");
-            }
-        } else {
-            puts("Usage: kill <pid>\n");
+    
+    // Count and list all tasks
+    int task_count = 0;
+    task_t *task = current;
+    
+    do {
+        const char *state_str = "UNKNOWN";
+        switch (task->state) {
+            case TASK_RUNNING: state_str = "RUNNING"; break;
+            case TASK_INTERRUPTIBLE: state_str = "INTERRUPTIBLE"; break;
+            case TASK_UNINTERRUPTIBLE: state_str = "UNINTERRUPTIBLE"; break;
+            case TASK_ZOMBIE: state_str = "ZOMBIE"; break;
+            case TASK_STOPPED: state_str = "STOPPED"; break;
+            case TASK_TRACED: state_str = "TRACED"; break;
         }
+        
+        printf("  PID %d: %-16s (State: %s)\n", task->pid, task->comm, state_str);
+        task_count++;
+        task = task->next;
+    } while (task != current && task != NULL);
+    
+    printf("  Total tasks: %d\n", task_count);
+    puts("---------------------\n");
+}
+
+static void cmd_kill(const char *arg) {
+    if (strlen(arg) == 0) {
+        puts("Usage: kill <pid>\n");
+        return;
     }
-    else if (strcmp(cmd, "exit") == 0)
-    {
-        puts("Exiting shell task...\n");
+    
+    int pid = atoi(arg);
+    if (pid <= 0) {
+        puts("Error: Invalid PID. PID must be a positive integer.\n");
+        return;
     }
-    else if (strcmp(cmd, "reboot") == 0)
-    {
-        puts("Sending reset signal to PS/2 controller...\n");
-        outb(0x64, 0xFE);
+    
+    int result = kill_task(pid);
+    switch (result) {
+        case 0:
+            printf("Task with PID %d killed successfully.\n", pid);
+            break;
+        case -1:
+            printf("Error: Task with PID %d not found.\n", pid);
+            break;
+        case -2:
+            printf("Error: Cannot kill current shell task (PID %d).\n", pid);
+            break;
+        default:
+            printf("Error: Unknown error killing task %d.\n", pid);
+            break;
     }
-    else if (strlen(cmd) > 0)
-    {
-        puts("Error: '");
-        puts(cmd);
-        puts("' is not recognized as a command.\n");
-    }
+}
+
+static void cmd_reboot(const char *arg) {
+    (void)arg; // Unused parameter
+    puts("Sending reset signal to PS/2 controller...\n");
+    outb(0x64, 0xFE);
 }
 
 /**
