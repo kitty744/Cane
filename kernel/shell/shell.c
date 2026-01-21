@@ -222,7 +222,13 @@ static void cmd_tasks(const char *arg) {
             case TASK_TRACED: state_str = "TRACED"; break;
         }
         
-        printf("  PID %d: %-16s (State: %s)\n", task->pid, task->comm, state_str);
+        puts("  PID ");
+        printf("%d", task->pid);
+        puts(": ");
+        puts(task->comm);
+        puts(" (State: ");
+        puts(state_str);
+        puts(")\n");
         task_count++;
         task = task->next;
     } while (task != current && task != NULL);
