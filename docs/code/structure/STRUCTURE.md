@@ -4,7 +4,7 @@
 Valen/
 ├── arch/x86_64/         # Architecture-specific code
 ├── drivers/             # Device drivers
-├── include/Valen/        # Public headers
+├── include/valen/        # Public headers
 ├── kernel/              # Core kernel implementation
 ├── lib/                 # Standard library
 ├── mm/                  # Memory management

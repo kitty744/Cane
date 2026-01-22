@@ -142,7 +142,7 @@ void driver_handler(void) {
 
 To add a new driver to Valen:
 
-1. **Create header file** (`include/Valen/new_device.h`):
+1. **Create header file** (`include/valen/new_device.h`):
 
 ```c
 #ifndef NEW_DEVICE_H
