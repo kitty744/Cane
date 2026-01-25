@@ -4,8 +4,6 @@
 
 A modern x86_64 operating system built from scratch with comprehensive hardware compatibility and a retro GUI aesthetic.
 
-[Join our Discord server!](https://discord.gg/JR4znNRFw8)
-
 ## Overview
 
 Valen is an operating system designed to run on both old and new hardware.
